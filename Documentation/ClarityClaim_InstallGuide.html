@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClarityClaim — Installation Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Serif:wght@400;600&family+IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:       #f4f4f4;
+    --surface:  #ffffff;
+    --s2:       #f4f4f4;
+    --border:   #e0e0e0;
+    --border2:  #c6c6c6;
+    --ink:      #161616;
+    --ink2:     #393939;
+    --slate:    #525252;
+    --muted:    #6f6f6f;
+    --blue:     #0f62fe;
+    --blue-lt:  #edf5ff;
+    --blue-dk:  #002d9c;
+    --teal:     #007d79;
+    --teal-lt:  #d9fbfb;
+    --green:    #198038;
+    --green-lt: #defbe6;
+    --amber:    #b28600;
+    --amber-lt: #fdf6dd;
+    --red:      #da1e28;
+    --red-lt:   #fff1f1;
+    --purple:   #6929c4;
+    --purple-lt:#f6f2ff;
+    --mono:     'IBM Plex Mono', 'Courier New', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed; top: 0; left: 0;
+    width: 240px; height: 100vh;
+    background: var(--ink);
+    overflow-y: auto; z-index: 100;
+  }
+  .sb-brand { padding: 22px 20px 18px; border-bottom: 1px solid #393939; }
+  .sb-name { font-family: 'IBM Plex Serif', serif; font-size: 16px; font-weight: 600; color: #fff; }
+  .sb-sub  { font-family: var(--mono); font-size: 10px; color: #525252; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+  .sb-group { padding: 14px 0 0; }
+  .sb-group-label { padding: 0 20px 5px; font-size: 10px; font-weight: 600; color: #393939; text-transform: uppercase; letter-spacing: 0.1em; }
+  .sidebar a { display: block; padding: 6px 20px; font-size: 12.5px; color: #8d8d8d; text-decoration: none; border-left: 2px solid transparent; transition: all 0.12s; }
+  .sidebar a:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--blue); }
+
+  /* MAIN */
+  .main { margin-left: 240px; }
+
+  /* HERO */
+  .hero {
+    background: var(--ink);
+    padding: 52px 60px 44px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 48px);
+    pointer-events: none;
+  }
+  .hero-tag { font-family: var(--mono); font-size: 10px; color: #4589ff; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 14px; }
+  .hero h1 { font-family: 'IBM Plex Serif', serif; font-size: clamp(26px, 3.5vw, 42px); font-weight: 600; color: #fff; line-height: 1.12; margin-bottom: 14px; letter-spacing: -0.02em; max-width: 620px; }
+  .hero h1 span { color: #4589ff; }
+  .hero-desc { color: #8d8d8d; max-width: 540px; font-size: 14.5px; margin-bottom: 28px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { background: #262626; border: 1px solid #393939; border-radius: 2px; padding: 4px 12px; font-family: var(--mono); font-size: 11px; color: #8d8d8d; }
+  .chip.ok { border-color: var(--teal); color: #3ddbd9; }
+  .chip.warn { border-color: var(--amber); color: #f1c21b; }
+  .chip.blue { border-color: var(--blue); color: #78a9ff; }
+
+  /* SECTION */
+  .section { padding: 44px 60px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .section:nth-child(even) { background: var(--bg); }
+  .section:last-child { border-bottom: none; }
+
+  .eyebrow { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--blue); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 6px; }
+  h2 { font-family: 'IBM Plex Serif', serif; font-size: clamp(20px, 2.5vw, 30px); font-weight: 600; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.02em; }
+  h3 { font-family: 'IBM Plex Serif', serif; font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+  h4 { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin: 22px 0 10px; }
+  h4:first-child { margin-top: 0; }
+  p { color: var(--slate); margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  strong { color: var(--ink); font-weight: 600; }
+
+  .lead { color: var(--slate); font-size: 15px; max-width: 680px; margin-bottom: 28px; border-left: 3px solid var(--blue); padding-left: 14px; }
+
+  /* INSTALL STEP CARD */
+  .install-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .section:nth-child(even) .install-block { background: var(--bg); }
+  .ib-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .section:nth-child(even) .ib-header { background: #fff; }
+  .ib-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    flex-shrink: 0;
+  }
+  .ib-title { font-weight: 600; color: var(--ink); font-size: 14px; }
+  .ib-sub   { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .ib-body  { padding: 18px 20px; }
+
+  /* STATUS BADGE */
+  .badge {
+    display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.07em; padding: 2px 8px; border-radius: 2px; margin-left: 8px;
+  }
+  .b-ok     { background: var(--green-lt); color: var(--green); }
+  .b-warn   { background: var(--amber-lt); color: var(--amber); }
+  .b-new    { background: var(--blue-lt);  color: var(--blue-dk); }
+  .b-nuget  { background: var(--purple-lt); color: var(--purple); }
+  .b-skip   { background: #e8e8e8; color: var(--muted); }
+
+  /* CODE BLOCKS */
+  .cmd {
+    background: #161616;
+    border-radius: 2px;
+    padding: 14px 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: #a8a8a8;
+    line-height: 1.85;
+    overflow-x: auto;
+    margin: 12px 0;
+    border: 1px solid #262626;
+    position: relative;
+  }
+  .cmd .c-blue  { color: #78a9ff; }
+  .cmd .c-green { color: #42be65; }
+  .cmd .c-teal  { color: #3ddbd9; }
+  .cmd .c-amber { color: #f1c21b; }
+  .cmd .c-muted { color: #525252; }
+  .cmd .c-red   { color: #ff8389; }
+  .cmd-label {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase;
+    letter-spacing: 0.12em; color: #525252; margin-bottom: 8px; display: block;
+  }
+
+  /* NOTICE */
+  .notice { border-left: 3px solid var(--blue); background: var(--blue-lt); padding: 12px 16px; margin: 12px 0; border-radius: 0 2px 2px 0; }
+  .notice.green  { border-left-color: var(--green); background: var(--green-lt); }
+  .notice.amber  { border-left-color: var(--amber); background: var(--amber-lt); }
+  .notice.red    { border-left-color: var(--red);   background: var(--red-lt);   }
+  .notice p { color: var(--ink2); font-size: 13px; }
+
+  /* GRID */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* SUMMARY TABLE */
+  .tbl { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; margin: 16px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: var(--ink); color: #8d8d8d; padding: 10px 14px; text-align: left; font-family: var(--mono); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--slate); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--s2); }
+  td strong { color: var(--ink); }
+  code { font-family: var(--mono); font-size: 11.5px; background: var(--s2); border: 1px solid var(--border2); border-radius: 2px; padding: 1px 6px; color: var(--blue); }
+
+  /* NUGET TABLE */
+  .nuget-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .nuget-row:last-child { border-bottom: none; }
+  .nuget-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+  .nuget-pkg { font-family: var(--mono); font-size: 12px; color: var(--blue); font-weight: 500; margin-bottom: 3px; }
+  .nuget-desc { font-size: 13px; color: var(--slate); }
+
+  /* VERIFY BLOCK */
+  .verify {
+    background: var(--green-lt);
+    border: 1px solid #a7f0ba;
+    border-radius: 2px;
+    padding: 14px 16px;
+    margin-top: 12px;
+  }
+  .verify-label { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+  .verify .cmd  { background: #fff; border-color: #a7f0ba; margin: 8px 0 0; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; }
+  .checklist li { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--slate); }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: '☐'; color: var(--blue); flex-shrink: 0; margin-top: 1px; font-size: 14px; }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .section { padding: 36px 20px; }
+    .g2, .g3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-name">ClarityClaim</div>
+    <div class="sb-sub">Installation Guide</div>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Overview</div>
+    <a href="#summary">What Needs Installing</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Software</div>
+    <a href="#dotnet">.NET 10 SDK</a>
+    <a href="#nodejs">Node.js 22 LTS</a>
+    <a href="#vscode">Visual Studio / VS Code</a>
+    <a href="#git">Git</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">NuGet Packages</div>
+    <a href="#nuget-backend">Backend NuGet Packages</a>
+    <a href="#nuget-whisper">Whisper.net + CUDA</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Frontend</div>
+    <a href="#vite">Vite + React + Tailwind</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Data & Assets</div>
+    <a href="#cms">CMS NCD/LCD PDFs</a>
+    <a href="#fhir">FHIR Patient Cache</a>
+    <a href="#whisper-model">Whisper Model Download</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Verify</div>
+    <a href="#verify">Full Verification Checklist</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">ClarityClaim — Machine Setup Guide</div>
+  <h1>Everything you need<br>to <span>install and verify</span></h1>
+  <p class="hero-desc">Complete step-by-step installation guide for every software, package, and asset required to build and run ClarityClaim on a Windows machine. Follow in order — each step builds on the previous.</p>
+  <div class="chip-row">
+    <div class="chip ok">LM Studio — Already installed</div>
+    <div class="chip warn">.NET 10 SDK — Install needed</div>
+    <div class="chip warn">Node.js 22 LTS — Install needed</div>
+    <div class="chip warn">NuGet packages — 6 packages</div>
+    <div class="chip warn">Whisper.net — Install needed</div>
+    <div class="chip blue">Frontend scaffold — 1 command</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: SUMMARY -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="summary">
+  <div class="eyebrow">Overview</div>
+  <h2>Complete List — What Needs Installing</h2>
+  <p class="lead">12 things total. LM Studio is already running on your machine. Everything else needs a one-time install. This guide covers all of them in order.</p>
+
+  <div class="tbl"><table>
+    <thead>
+      <tr><th>#</th><th>Item</th><th>Type</th><th>Why You Need It</th><th>Time</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td><strong>LM Studio</strong></td><td>App</td><td>Serves all AI models at localhost:1234</td><td>—</td><td><span class="badge b-ok">Already done</span></td></tr>
+      <tr><td>2</td><td><strong>.NET 10 SDK</strong></td><td>SDK</td><td>Build and run the ASP.NET Core Web API backend</td><td>~5 min</td><td><span class="badge b-new">Install</span></td></tr>
+      <tr><td>3</td><td><strong>Visual Studio 2022</strong> or <strong>VS Code</strong></td><td>IDE</td><td>Write and debug C# backend code</td><td>~10 min</td><td><span class="badge b-new">Install</span></td></tr>
+      <tr><td>4</td><td><strong>Node.js 22 LTS</strong></td><td>Runtime</td><td>Run Vite dev server for the React frontend</td><td>~5 min</td><td><span class="badge b-new">Install</span></td></tr>
+      <tr><td>5</td><td><strong>Git</strong></td><td>Tool</td><td>Version control — share code between team members</td><td>~3 min</td><td><span class="badge b-new">Install</span></td></tr>
+      <tr><td>6</td><td><strong>Microsoft.Extensions.VectorData.Abstractions</strong></td><td>NuGet</td><td>Vector store abstraction layer for RAG</td><td>~1 min</td><td><span class="badge b-nuget">NuGet</span></td></tr>
+      <tr><td>7</td><td><strong>Microsoft.SemanticKernel.Connectors.InMemory</strong></td><td>NuGet</td><td>In-memory vector store provider (no Docker needed)</td><td>~1 min</td><td><span class="badge b-nuget">NuGet</span></td></tr>
+      <tr><td>8</td><td><strong>Microsoft.Extensions.AI</strong></td><td>NuGet</td><td>Embedding generator interface — calls Nomic via LM Studio</td><td>~1 min</td><td><span class="badge b-nuget">NuGet</span></td></tr>
+      <tr><td>9</td><td><strong>PdfPig</strong></td><td>NuGet</td><td>Extract text from NCD/LCD policy PDFs for RAG indexing</td><td>~1 min</td><td><span class="badge b-nuget">NuGet</span></td></tr>
+      <tr><td>10</td><td><strong>Whisper.net + Whisper.net.Runtime.Cuda.Windows</strong></td><td>NuGet</td><td>Local speech-to-text — transcribes clinical encounters</td><td>~2 min</td><td><span class="badge b-nuget">NuGet</span></td></tr>
+      <tr><td>11</td><td><strong>Whisper medium model weights</strong></td><td>File download</td><td>The actual AI model Whisper.net uses for transcription</td><td>~5 min</td><td><span class="badge b-new">Download</span></td></tr>
+      <tr><td>12</td><td><strong>CMS NCD/LCD PDFs</strong></td><td>File download</td><td>Insurance policy documents for the RAG knowledge base</td><td>~10 min</td><td><span class="badge b-new">Download</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="notice green">
+    <p><strong>Good news:</strong> You do not need Docker, a database server, Python, any cloud account, or any API key. Everything runs locally. The most complex install is .NET SDK and that is a standard Windows installer — next, next, finish.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: .NET SDK -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="dotnet">
+  <div class="eyebrow">Software Install 01</div>
+  <h2>.NET 10 SDK</h2>
+  <p class="lead">The .NET SDK is the compiler, runtime, and toolchain for your C# backend. Without this, you cannot build or run the ASP.NET Core Web API. Install this first before anything else.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Download .NET 10 SDK</div><div class="ib-sub">dotnet.microsoft.com — free, official Microsoft download</div></div>
+    </div>
+    <div class="ib-body">
+      <p>Open your browser and go to:</p>
+      <div class="cmd"><span class="c-blue">https://dotnet.microsoft.com/en-us/download/dotnet/10.0</span></div>
+      <p>On the page, under <strong>SDK</strong> (not Runtime), click the <strong>Windows x64 Installer</strong> button. This downloads a file named something like <code>dotnet-sdk-10.x.x-win-x64.exe</code> — approximately 200MB.</p>
+      <div class="notice amber">
+        <p><strong>SDK vs Runtime:</strong> Download the <strong>SDK</strong>, not the Runtime. The SDK includes everything — the runtime is bundled inside it. If you download only the Runtime, you will not be able to compile code.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">2</div>
+      <div><div class="ib-title">Run the installer</div><div class="ib-sub">Standard Windows installer — takes about 3 minutes</div></div>
+    </div>
+    <div class="ib-body">
+      <p>Double-click the downloaded <code>.exe</code> file. The installer will show a wizard. Click through the defaults — no configuration is needed. It installs to <code>C:\Program Files\dotnet\</code> automatically and adds itself to your system PATH.</p>
+      <p>When the installer finishes, <strong>close and reopen any open terminal windows</strong> so the PATH update takes effect.</p>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">3</div>
+      <div><div class="ib-title">Verify the install</div><div class="ib-sub">Open a new terminal — PowerShell or Command Prompt</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="verify">
+        <div class="verify-label">✓ Verification Command</div>
+        <div class="cmd"><span class="c-teal">dotnet --version</span></div>
+        <p style="font-size:13px; color: var(--slate); margin-top:8px;">You should see a version number starting with <strong>10.</strong> — for example <code>10.0.x</code>. If you see a version number starting with 8 or 9, the old version is still taking priority — restart your machine and try again.</p>
+        <div class="cmd"><span class="c-muted"># Also verify the SDK list</span>
+<span class="c-teal">dotnet --list-sdks</span>
+<span class="c-muted"># Expected output: 10.0.x [C:\Program Files\dotnet\sdk]</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: NODE.JS -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="nodejs">
+  <div class="eyebrow">Software Install 02</div>
+  <h2>Node.js 22 LTS</h2>
+  <p class="lead">Node.js is required to run the React frontend development server (Vite). It also installs npm, which manages all frontend JavaScript packages. The backend does not use Node — it's purely for the UI.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Download Node.js 22 LTS</div><div class="ib-sub">nodejs.org — always use the LTS version, not Current</div></div>
+    </div>
+    <div class="ib-body">
+      <p>Go to:</p>
+      <div class="cmd"><span class="c-blue">https://nodejs.org/en/download</span></div>
+      <p>Select <strong>LTS</strong> (Long Term Support) — currently version 22. Click <strong>Windows Installer (.msi) 64-bit</strong>. Downloads approximately 30MB.</p>
+      <div class="notice amber">
+        <p><strong>LTS not Current:</strong> Always use the LTS version for development work. The "Current" version has experimental features and is less stable. Node 22 LTS is what you want.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">2</div>
+      <div><div class="ib-title">Run the installer</div><div class="ib-sub">Accept all defaults — takes about 2 minutes</div></div>
+    </div>
+    <div class="ib-body">
+      <p>Run the <code>.msi</code> file. Accept the license agreement. Leave all install options at their defaults — this includes npm (the package manager) and adding Node to your PATH automatically. Do not change the install directory.</p>
+      <p>On the "Tools for Native Modules" screen — <strong>leave the checkbox unchecked</strong> unless you know you need it. It is not required for this project and would trigger a large additional download.</p>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">3</div>
+      <div><div class="ib-title">Verify the install</div><div class="ib-sub">Open a new terminal after install</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="verify">
+        <div class="verify-label">✓ Verification Commands</div>
+        <div class="cmd"><span class="c-teal">node --version</span>
+<span class="c-muted"># Expected: v22.x.x</span>
+
+<span class="c-teal">npm --version</span>
+<span class="c-muted"># Expected: 10.x.x or higher</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: IDE -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="vscode">
+  <div class="eyebrow">Software Install 03</div>
+  <h2>IDE — Visual Studio 2022 or VS Code</h2>
+  <p class="lead">You need a code editor. Two options — choose one based on what your team prefers. Visual Studio 2022 Community is the full IDE with built-in NuGet management. VS Code is lighter and works well with the C# Dev Kit extension.</p>
+
+  <div class="g2">
+    <div class="install-block" style="margin-bottom:0;">
+      <div class="ib-header">
+        <div class="ib-num" style="background: var(--purple);">A</div>
+        <div><div class="ib-title">Visual Studio 2022 Community</div><div class="ib-sub">Recommended if your team does .NET day-to-day</div></div>
+      </div>
+      <div class="ib-body">
+        <div class="cmd"><span class="c-blue">https://visualstudio.microsoft.com/downloads/</span></div>
+        <p style="font-size:13px;">Download <strong>Community 2022</strong> — free for individuals and small teams. During install, select the <strong>"ASP.NET and web development"</strong> workload. This installs everything needed for the backend. Approximately 5GB total install size.</p>
+        <div class="notice">
+          <p><strong>Minimum version required:</strong> Visual Studio 17.12 or later to support .NET 10.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="install-block" style="margin-bottom:0;">
+      <div class="ib-header">
+        <div class="ib-num" style="background: var(--teal);">B</div>
+        <div><div class="ib-title">VS Code + C# Dev Kit</div><div class="ib-sub">Lighter option — good if team uses VS Code already</div></div>
+      </div>
+      <div class="ib-body">
+        <div class="cmd"><span class="c-blue">https://code.visualstudio.com/download</span></div>
+        <p style="font-size:13px;">Download VS Code for Windows. After installing, open VS Code and install two extensions from the Extensions panel (<code>Ctrl+Shift+X</code>):</p>
+        <div class="cmd"><span class="c-green">C# Dev Kit</span>       <span class="c-muted">(by Microsoft — includes C# language support)</span>
+<span class="c-green">C#</span>               <span class="c-muted">(by Microsoft — OmniSharp language server)</span></div>
+        <p style="font-size:13px; margin-top:8px;">VS Code is approximately 100MB — much faster to install than full Visual Studio.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: GIT -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="git">
+  <div class="eyebrow">Software Install 04</div>
+  <h2>Git</h2>
+  <p class="lead">Git is how your team shares code during the hackathon. Without it, you're emailing zip files. Install it once — takes 3 minutes.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Download and install Git for Windows</div><div class="ib-sub">git-scm.com — free, standard install</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-blue">https://git-scm.com/download/win</span></div>
+      <p>Download the 64-bit installer. Run it. During setup, when asked about the default editor, select <strong>Visual Studio Code</strong> or <strong>Notepad</strong> — whichever your team prefers. Leave all other options at defaults.</p>
+      <div class="verify">
+        <div class="verify-label">✓ Verification</div>
+        <div class="cmd"><span class="c-teal">git --version</span>
+<span class="c-muted"># Expected: git version 2.x.x.windows.x</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: NUGET BACKEND PACKAGES -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="nuget-backend">
+  <div class="eyebrow">NuGet Packages — Backend</div>
+  <h2>Installing Backend NuGet Packages</h2>
+  <p class="lead">NuGet packages are installed per project using the dotnet CLI or Visual Studio's NuGet manager. First create your backend project, then add these packages. All commands run in your terminal from inside the project folder.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Create the ASP.NET Core Web API project</div><div class="ib-sub">Run this once to scaffold the backend project</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-muted"># Create a new folder for the project and navigate into it</span>
+<span class="c-teal">mkdir ClarityClaim.Api</span>
+<span class="c-teal">cd ClarityClaim.Api</span>
+
+<span class="c-muted"># Scaffold a new ASP.NET Core Web API project</span>
+<span class="c-teal">dotnet new webapi -n ClarityClaim.Api --framework net10.0</span>
+<span class="c-teal">cd ClarityClaim.Api</span>
+
+<span class="c-muted"># Verify it builds before adding any packages</span>
+<span class="c-teal">dotnet build</span>
+<span class="c-muted"># Should output: Build succeeded.</span></div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">2</div>
+      <div><div class="ib-title">Install all NuGet packages — one command</div><div class="ib-sub">Copy and run this entire block in your terminal</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-muted"># Vector store abstraction layer</span>
+<span class="c-teal">dotnet add package Microsoft.Extensions.VectorData.Abstractions</span>
+
+<span class="c-muted"># In-memory vector store provider (no Docker, no external process)</span>
+<span class="c-teal">dotnet add package Microsoft.SemanticKernel.Connectors.InMemory --prerelease</span>
+
+<span class="c-muted"># AI abstraction layer — for embedding generation via LM Studio</span>
+<span class="c-teal">dotnet add package Microsoft.Extensions.AI</span>
+
+<span class="c-muted"># PDF text extraction — reads NCD/LCD policy PDFs for RAG indexing</span>
+<span class="c-teal">dotnet add package PdfPig</span>
+
+<span class="c-muted"># Whisper.net — C# bindings for local Whisper speech-to-text</span>
+<span class="c-teal">dotnet add package Whisper.net</span>
+
+<span class="c-muted"># JSON serialization — faster than built-in for our use case</span>
+<span class="c-teal">dotnet add package System.Text.Json</span></div>
+
+      <div class="notice">
+        <p><strong>Note on --prerelease:</strong> The InMemory connector requires the <code>--prerelease</code> flag because the GA implementation is rolling out across providers. This is safe to use — it is the official Microsoft package, just in active release cycle. No stability risk for a hackathon.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">3</div>
+      <div><div class="ib-title">Verify all packages installed</div><div class="ib-sub">Check the .csproj file to confirm all references are there</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-teal">dotnet list package</span></div>
+      <p style="margin-top:8px; font-size:13px;">You should see all 6 packages listed. Then build once more to confirm no dependency conflicts:</p>
+      <div class="cmd"><span class="c-teal">dotnet build</span>
+<span class="c-muted"># Must still say: Build succeeded.</span></div>
+    </div>
+  </div>
+
+  <h4>What each package does in plain English</h4>
+  <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 2px; padding: 4px 0; margin-top: 8px;">
+    <div class="nuget-row" style="padding: 14px 18px;">
+      <div class="nuget-icon">📦</div>
+      <div>
+        <div class="nuget-pkg">Microsoft.Extensions.VectorData.Abstractions</div>
+        <div class="nuget-desc">The interface contract for vector stores. Defines <code>IVectorStore</code>, <code>VectorStoreCollection</code>, and the attributes you put on your C# classes (<code>[VectorStoreKey]</code>, <code>[VectorStoreVector]</code>). Does nothing on its own — needs a provider (item below).</div>
+      </div>
+    </div>
+    <div class="nuget-row" style="padding: 14px 18px;">
+      <div class="nuget-icon">🧠</div>
+      <div>
+        <div class="nuget-pkg">Microsoft.SemanticKernel.Connectors.InMemory</div>
+        <div class="nuget-desc">The actual vector store that runs in RAM. Stores the NCD/LCD policy embeddings as vectors during the app session. No setup, no external process, no Docker. Re-indexes from PDFs every time the app starts — which is fine for a hackathon.</div>
+      </div>
+    </div>
+    <div class="nuget-row" style="padding: 14px 18px;">
+      <div class="nuget-icon">🤖</div>
+      <div>
+        <div class="nuget-pkg">Microsoft.Extensions.AI</div>
+        <div class="nuget-desc">Provides <code>IEmbeddingGenerator</code> — the standard interface for generating text embeddings. You configure it to call the Nomic Embed model running in LM Studio at <code>localhost:1234</code>. Same interface would work with any other embedding provider later.</div>
+      </div>
+    </div>
+    <div class="nuget-row" style="padding: 14px 18px;">
+      <div class="nuget-icon">📄</div>
+      <div>
+        <div class="nuget-pkg">PdfPig</div>
+        <div class="nuget-desc">Reads PDF files and extracts their text content. Used in the RAG indexing script to extract text from the NCD/LCD policy PDFs before chunking and embedding them. Pure .NET — no native dependencies.</div>
+      </div>
+    </div>
+    <div class="nuget-row" style="padding: 14px 18px;">
+      <div class="nuget-icon">🎙️</div>
+      <div>
+        <div class="nuget-pkg">Whisper.net</div>
+        <div class="nuget-desc">C# bindings for OpenAI's open-source Whisper model via whisper.cpp. Transcribes audio files to text entirely on-device. No API key, no cloud, no Python needed. Requires the runtime package below and a model weights file.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: WHISPER NUGET -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="nuget-whisper">
+  <div class="eyebrow">NuGet Packages — Whisper.net Runtime</div>
+  <h2>Whisper.net CUDA Runtime</h2>
+  <p class="lead">Whisper.net needs a native runtime package to do actual inference. Since your machine has a GPU, use the CUDA runtime — it runs transcription significantly faster than the CPU runtime. This is a separate NuGet package from Whisper.net itself.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Install the CUDA runtime for Windows</div><div class="ib-sub">GPU-accelerated Whisper transcription — much faster than CPU</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-muted"># GPU runtime — use this since your machine has a CUDA-capable GPU</span>
+<span class="c-teal">dotnet add package Whisper.net.Runtime.Cuda.Windows</span></div>
+
+      <div class="notice amber">
+        <p><strong>If you hit a CUDA version conflict:</strong> If your GPU driver supports CUDA 12 but not 13, use <code>Whisper.net.Runtime.Cuda12.Windows</code> instead. To check which CUDA version your machine supports, run <code>nvidia-smi</code> in your terminal and look at the "CUDA Version" in the top-right corner of the output.</p>
+      </div>
+
+      <div class="notice">
+        <p><strong>CPU fallback:</strong> If you want to avoid CUDA entirely, use <code>dotnet add package Whisper.net.Runtime</code> instead. It will be 3–5x slower for transcription but works without any GPU dependency. For a 45-second pre-recorded demo clip, even CPU Whisper completes in under 30 seconds.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">2</div>
+      <div><div class="ib-title">Download the Whisper medium model weights</div><div class="ib-sub">The actual AI model file — ~1.5GB download, one time only</div></div>
+    </div>
+    <div class="ib-body">
+      <p>Whisper.net needs the Whisper model weights file to function. Download the <strong>medium</strong> model — the best balance of accuracy for clinical terminology vs. speed.</p>
+      <div class="cmd"><span class="c-muted"># Option 1: Download directly via browser</span>
+<span class="c-blue">https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin</span>
+
+<span class="c-muted"># Option 2: Download via PowerShell (run in terminal)</span>
+<span class="c-teal">Invoke-WebRequest -Uri "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.bin" -OutFile "ggml-medium.bin"</span></div>
+
+      <p style="margin-top: 10px; font-size:13px;">Save this file to your project folder at <code>ClarityClaim.Api/Models/ggml-medium.bin</code>. The backend code will reference this path when initialising Whisper.net at startup.</p>
+
+      <div class="notice amber">
+        <p><strong>File size:</strong> The medium model is approximately 1.5GB. Download this before the hackathon on a good internet connection — do not attempt to download it on hackathon day Wi-Fi.</p>
+      </div>
+
+      <div class="notice">
+        <p><strong>Why not large-v3?</strong> The large-v3 model (3.1GB) is more accurate but noticeably slower. For a pre-recorded 45-second demo clip, medium is perfectly adequate and processes in under 15 seconds on GPU. Large-v3 would take 25–40 seconds for the same clip.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: FRONTEND -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="vite">
+  <div class="eyebrow">Frontend Setup</div>
+  <h2>React Frontend — Vite + Tailwind</h2>
+  <p class="lead">The frontend is scaffolded with a single command. Node.js must be installed first. This creates all the boilerplate React project structure and configures Tailwind CSS for styling.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Scaffold the React project</div><div class="ib-sub">Run from the root of your project — not inside the API folder</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-muted"># Navigate to your project root (one level above ClarityClaim.Api)</span>
+<span class="c-teal">cd ..</span>
+
+<span class="c-muted"># Create the React frontend project</span>
+<span class="c-teal">npm create vite@latest clarity-claim-ui -- --template react</span>
+
+<span class="c-muted"># Navigate into the new frontend folder</span>
+<span class="c-teal">cd clarity-claim-ui</span>
+
+<span class="c-muted"># Install all base dependencies</span>
+<span class="c-teal">npm install</span></div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">2</div>
+      <div><div class="ib-title">Install Tailwind CSS</div><div class="ib-sub">Utility-first CSS framework for fast UI building</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-muted"># Install Tailwind and its peer dependencies</span>
+<span class="c-teal">npm install -D tailwindcss postcss autoprefixer</span>
+
+<span class="c-muted"># Initialise Tailwind config file</span>
+<span class="c-teal">npx tailwindcss init -p</span></div>
+
+      <p style="margin-top: 10px; font-size:13px;">After running <code>init</code>, open the generated <code>tailwind.config.js</code> and replace the <code>content</code> array with:</p>
+      <div class="cmd"><span class="c-muted">// tailwind.config.js</span>
+content: [<span class="c-green">"./index.html"</span>, <span class="c-green">"./src/**/*.{js,jsx,ts,tsx}"</span>]</div>
+
+      <p style="font-size:13px;">Then open <code>src/index.css</code> and replace its entire contents with:</p>
+      <div class="cmd"><span class="c-blue">@tailwind base;</span>
+<span class="c-blue">@tailwind components;</span>
+<span class="c-blue">@tailwind utilities;</span></div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">3</div>
+      <div><div class="ib-title">Install Axios for API calls</div><div class="ib-sub">HTTP client for calling the .NET backend</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-teal">npm install axios</span></div>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">4</div>
+      <div><div class="ib-title">Verify the frontend runs</div><div class="ib-sub">Should open a browser tab at localhost:5173</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-teal">npm run dev</span>
+<span class="c-muted"># Expected output:
+#   VITE v5.x ready in 300ms
+#   ➜  Local:   http://localhost:5173/</span></div>
+      <p style="margin-top:8px; font-size:13px;">Open <code>http://localhost:5173</code> in your browser. You should see the default Vite + React starter page. Installation is complete.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: CMS PDFS -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="cms">
+  <div class="eyebrow">Data Download 01</div>
+  <h2>CMS NCD/LCD Policy PDFs</h2>
+  <p class="lead">These are the insurance coverage policy documents your RAG pipeline indexes. They are free, publicly available from the CMS website — no login, no registration. Download these before the hackathon.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Navigate to the CMS Coverage Database</div><div class="ib-sub">The official source for all NCD/LCD policies in the US</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-blue">https://www.cms.gov/medicare-coverage-database/view/lcd.aspx</span></div>
+      <p>This is the LCD search page. You will search for each policy by its LCD ID. Make sure you are on the <strong>LCD</strong> tab (Local Coverage Determinations), not NCD.</p>
+    </div>
+  </div>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">2</div>
+      <div><div class="ib-title">Download these 3 specific LCDs for your demo scenario</div><div class="ib-sub">Low back pain / lumbar MRI scenario requires these policies</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="tbl" style="margin-top:0;"><table>
+        <thead><tr><th>LCD ID</th><th>Title</th><th>Why You Need It</th><th>How to Find It</th></tr></thead>
+        <tbody>
+          <tr><td><strong>L35062</strong></td><td>Lumbar Spine MRI</td><td>Primary demo scenario — your gap analysis will reference this policy when the patient needs an MRI for low back pain</td><td>Search "L35062" in the LCD ID field on the CMS search page</td></tr>
+          <tr><td><strong>L34067</strong></td><td>Cognitive Tests</td><td>Used in the PS 35 regulatory updates panel to show a policy change notification</td><td>Search "L34067"</td></tr>
+          <tr><td><strong>L35101</strong></td><td>Polysomnography and Sleep Studies</td><td>Second entry in the regulatory updates panel</td><td>Search "L35101"</td></tr>
+        </tbody>
+      </table></div>
+
+      <p style="margin-top:12px; font-size:13px;">For each LCD, open the policy page and look for a <strong>PDF download link</strong> or a "Print" button that generates a PDF. Save each file to:</p>
+      <div class="cmd"><span class="c-green">ClarityClaim.Api/Data/Policies/L35062_lumbar_mri.pdf</span>
+<span class="c-green">ClarityClaim.Api/Data/Policies/L34067_cognitive_tests.pdf</span>
+<span class="c-green">ClarityClaim.Api/Data/Policies/L35101_sleep_studies.pdf</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: FHIR CACHE -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="fhir">
+  <div class="eyebrow">Data Download 02</div>
+  <h2>HAPI FHIR Patient Cache</h2>
+  <p class="lead">Run these four API calls once before the hackathon and save the responses as JSON files. The backend will serve from these files during the demo — meaning the FHIR integration works even when the internet is disconnected.</p>
+
+  <div class="install-block">
+    <div class="ib-header">
+      <div class="ib-num">1</div>
+      <div><div class="ib-title">Make the four FHIR API calls via PowerShell</div><div class="ib-sub">Run from anywhere — just needs internet access</div></div>
+    </div>
+    <div class="ib-body">
+      <div class="cmd"><span class="c-muted"># Create the data directory first</span>
+<span class="c-teal">mkdir ClarityClaim.Api\Data\FHIR</span>
+
+<span class="c-muted"># Patient demographics</span>
+<span class="c-teal">Invoke-WebRequest -Uri "https://hapi.fhir.org/baseR4/Patient/592" -OutFile "ClarityClaim.Api\Data\FHIR\patient.json"</span>
+
+<span class="c-muted"># Existing conditions / diagnoses</span>
+<span class="c-teal">Invoke-WebRequest -Uri "https://hapi.fhir.org/baseR4/Condition?patient=592" -OutFile "ClarityClaim.Api\Data\FHIR\conditions.json"</span>
+
+<span class="c-muted"># Current medications</span>
+<span class="c-teal">Invoke-WebRequest -Uri "https://hapi.fhir.org/baseR4/MedicationRequest?patient=592" -OutFile "ClarityClaim.Api\Data\FHIR\medications.json"</span>
+
+<span class="c-muted"># Allergies</span>
+<span class="c-teal">Invoke-WebRequest -Uri "https://hapi.fhir.org/baseR4/AllergyIntolerance?patient=592" -OutFile "ClarityClaim.Api\Data\FHIR\allergies.json"</span></div>
+
+      <div class="notice amber">
+        <p><strong>Patient ID 592:</strong> Confirm this patient ID returns valid data before the hackathon by opening the URL in your browser. If Patient 592 doesn't exist on the test server at the time, pick any valid patient ID from the HAPI public server — browse <code>https://hapi.fhir.org/baseR4/Patient?_count=10</code> to find active test patients and use their ID consistently across all four calls.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- SECTION: VERIFY -->
+<!-- ═══════════════════════════════════════ -->
+<div class="section" id="verify">
+  <div class="eyebrow">Final Step</div>
+  <h2>Complete Verification Checklist</h2>
+  <p class="lead">Run through every item on this list after all installs are complete. Everything must pass before the hackathon clock starts. Assign one person to own this verification.</p>
+
+  <div class="g2">
+    <div>
+      <h4>Software — Run These Commands</h4>
+      <div class="cmd"><span class="c-muted"># 1. .NET SDK</span>
+<span class="c-teal">dotnet --version</span>
+<span class="c-muted"># Must show: 10.x.x</span>
+
+<span class="c-muted"># 2. Node.js</span>
+<span class="c-teal">node --version</span>
+<span class="c-muted"># Must show: v22.x.x</span>
+
+<span class="c-muted"># 3. npm</span>
+<span class="c-teal">npm --version</span>
+<span class="c-muted"># Must show: 10.x.x or higher</span>
+
+<span class="c-muted"># 4. Git</span>
+<span class="c-teal">git --version</span>
+<span class="c-muted"># Must show: git version 2.x.x</span></div>
+    </div>
+    <div>
+      <h4>Backend — Build Must Succeed</h4>
+      <div class="cmd"><span class="c-muted"># Navigate to API project</span>
+<span class="c-teal">cd ClarityClaim.Api</span>
+
+<span class="c-muted"># List all packages</span>
+<span class="c-teal">dotnet list package</span>
+<span class="c-muted"># Must show all 6 NuGet packages</span>
+
+<span class="c-muted"># Full build — must succeed</span>
+<span class="c-teal">dotnet build</span>
+<span class="c-muted"># Must show: Build succeeded. 0 Error(s)</span></div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top: 14px;">
+    <div>
+      <h4>Frontend — Dev Server Must Start</h4>
+      <div class="cmd"><span class="c-teal">cd clarity-claim-ui</span>
+<span class="c-teal">npm run dev</span>
+<span class="c-muted"># Must show: VITE ready at localhost:5173</span>
+<span class="c-muted"># Open browser — default Vite page must load</span></div>
+    </div>
+    <div>
+      <h4>LM Studio — Models Must Respond</h4>
+      <div class="cmd"><span class="c-muted"># Test Qwen Instance 1 via curl or PowerShell</span>
+<span class="c-teal">Invoke-WebRequest -Uri "http://localhost:1234/v1/models"</span>
+<span class="c-muted"># Must return JSON listing loaded models</span>
+<span class="c-muted"># Both Qwen instances must appear in the list</span></div>
+    </div>
+  </div>
+
+  <h4 style="margin-top: 24px;">Files — All Must Exist</h4>
+  <ul class="checklist">
+    <li><code>ClarityClaim.Api/Models/ggml-medium.bin</code> — Whisper model weights (~1.5GB)</li>
+    <li><code>ClarityClaim.Api/Data/Policies/L35062_lumbar_mri.pdf</code> — CMS LCD policy</li>
+    <li><code>ClarityClaim.Api/Data/Policies/L34067_cognitive_tests.pdf</code> — CMS LCD policy</li>
+    <li><code>ClarityClaim.Api/Data/Policies/L35101_sleep_studies.pdf</code> — CMS LCD policy</li>
+    <li><code>ClarityClaim.Api/Data/FHIR/patient.json</code> — HAPI FHIR patient cache</li>
+    <li><code>ClarityClaim.Api/Data/FHIR/conditions.json</code> — HAPI FHIR conditions cache</li>
+    <li><code>ClarityClaim.Api/Data/FHIR/medications.json</code> — HAPI FHIR medications cache</li>
+    <li><code>ClarityClaim.Api/Data/FHIR/allergies.json</code> — HAPI FHIR allergies cache</li>
+    <li>Demo audio clip saved (45-second low back pain encounter recording)</li>
+  </ul>
+
+  <div class="notice green" style="margin-top: 20px;">
+    <p><strong>If every command passes and every file exists — you are ready to build.</strong> The 48-hour hackathon clock can start. Your team should not spend any time during the hackathon on installation. All of this must be done before day one.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="background: var(--ink); border-top: 1px solid #393939; padding: 26px 60px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div>
+      <div style="font-family: 'IBM Plex Serif', serif; color:#fff; font-size:15px; font-weight:600;">ClarityClaim — Installation Guide</div>
+      <div style="font-family: var(--mono); color:#525252; font-size:11px; margin-top:4px;">.NET 10 · Node 22 LTS · Whisper.net CUDA · NuGet × 6 · CMS PDFs · FHIR Cache</div>
+    </div>
+    <div style="font-family: var(--mono); font-size:11px; background: #1c4f1c; border: 1px solid var(--green); color: #42be65; padding: 4px 12px; border-radius: 2px;">Ready to Build</div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</body>
+</html>

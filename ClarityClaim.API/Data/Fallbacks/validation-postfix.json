@@ -1,0 +1,13 @@
+{
+  "approvalProbability": 93,
+  "gaps": [],
+  "fixes": [],
+  "policyReferences": ["LCD L34220 — Lumbar MRI p.3"],
+  "passingCriteria": [
+    "Radicular symptoms documented",
+    "Positive straight leg raise documented",
+    "Dermatomal sensory findings documented",
+    "4 weeks of conservative treatment documented (physical therapy and NSAIDs)"
+  ],
+  "humanReviewFlags": []
+}

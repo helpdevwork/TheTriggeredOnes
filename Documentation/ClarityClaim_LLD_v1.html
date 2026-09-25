@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClarityClaim — Low Level Design v1.0</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  --bg:        #0e0e10;
+  --s1:        #18181c;
+  --s2:        #222228;
+  --s3:        #2a2a32;
+  --border:    #2e2e38;
+  --border2:   #3a3a46;
+  --ink:       #f0f0f5;
+  --ink2:      #c8c8d8;
+  --muted:     #8888a0;
+  --light:     #55556a;
+  --blue:      #5b9cf6;
+  --blue-dk:   #2563eb;
+  --blue-lt:   rgba(91,156,246,0.1);
+  --teal:      #2dd4bf;
+  --teal-lt:   rgba(45,212,191,0.1);
+  --green:     #4ade80;
+  --green-lt:  rgba(74,222,128,0.1);
+  --amber:     #fbbf24;
+  --amber-lt:  rgba(251,191,36,0.1);
+  --red:       #f87171;
+  --red-lt:    rgba(248,113,113,0.1);
+  --purple:    #c084fc;
+  --purple-lt: rgba(192,132,252,0.1);
+  --mono:      'Fira Code', 'Courier New', monospace;
+  --serif:     'Playfair Display', serif;
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body { background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; font-size:13.5px; line-height:1.7; }
+
+/* SIDEBAR */
+.sidebar { position:fixed; top:0; left:0; width:230px; height:100vh; background:var(--s1); border-right:1px solid var(--border); overflow-y:auto; z-index:100; }
+.sb-brand { padding:20px 18px 16px; border-bottom:1px solid var(--border); }
+.sb-title { font-family:var(--serif); font-size:15px; font-weight:700; color:var(--ink); }
+.sb-ver   { font-family:var(--mono); font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:3px; }
+.sb-grp   { padding:14px 0 0; }
+.sb-grp-label { padding:0 18px 4px; font-size:9.5px; font-weight:600; color:var(--light); text-transform:uppercase; letter-spacing:0.12em; }
+.sidebar a { display:block; padding:5px 18px; font-size:12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; transition:all 0.12s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sidebar a:hover { color:var(--blue); background:var(--blue-lt); border-left-color:var(--blue); }
+
+/* MAIN */
+.main { margin-left:230px; }
+
+/* HERO */
+.hero { background:var(--s1); border-bottom:1px solid var(--border); padding:52px 60px 44px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 700px 400px at 100% 50%, rgba(91,156,246,0.06), transparent); pointer-events:none; }
+.hero-eyebrow { font-family:var(--mono); font-size:10px; color:var(--blue); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+.hero-eyebrow::before { content:''; width:20px; height:1px; background:var(--blue); }
+.hero h1 { font-family:var(--serif); font-size:clamp(26px,3.5vw,44px); font-weight:700; color:var(--ink); line-height:1.1; margin-bottom:14px; max-width:660px; }
+.hero h1 em { font-style:italic; color:var(--blue); }
+.hero-desc { color:var(--muted); max-width:580px; font-size:14px; margin-bottom:28px; }
+.chip-row { display:flex; flex-wrap:wrap; gap:7px; }
+.chip { background:var(--s2); border:1px solid var(--border); border-radius:3px; padding:3px 11px; font-family:var(--mono); font-size:10.5px; color:var(--muted); }
+.chip.hi { border-color:rgba(91,156,246,0.4); color:var(--blue); }
+.chip.teal { border-color:rgba(45,212,191,0.4); color:var(--teal); }
+
+/* SECTION */
+.sec { padding:44px 60px; border-bottom:1px solid var(--border); }
+.sec:last-child { border-bottom:none; }
+.sec:nth-child(even) { background:rgba(255,255,255,0.012); }
+
+.ey { font-family:var(--mono); font-size:9.5px; color:var(--blue); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:6px; }
+h2 { font-family:var(--serif); font-size:clamp(20px,2.5vw,30px); font-weight:700; color:var(--ink); margin-bottom:6px; letter-spacing:-0.01em; }
+h3 { font-family:var(--serif); font-size:17px; font-weight:600; color:var(--ink); margin-bottom:6px; }
+h4 { font-family:var(--mono); font-size:10px; font-weight:500; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin:20px 0 8px; }
+h4:first-child { margin-top:0; }
+p { color:var(--ink2); margin-bottom:12px; font-size:13.5px; }
+p:last-child { margin-bottom:0; }
+strong { color:var(--ink); font-weight:600; }
+.lead { color:var(--ink2); font-size:14px; max-width:720px; margin-bottom:28px; padding-left:14px; border-left:2px solid var(--blue); }
+
+/* CARDS */
+.card { background:var(--s1); border:1px solid var(--border); border-radius:4px; padding:22px; margin-bottom:12px; }
+.card.blue-t  { border-top:2px solid var(--blue); }
+.card.teal-t  { border-top:2px solid var(--teal); }
+.card.green-t { border-top:2px solid var(--green); }
+.card.amber-t { border-top:2px solid var(--amber); }
+.card.red-t   { border-top:2px solid var(--red); }
+.card.purple-t{ border-top:2px solid var(--purple); }
+
+.tag { display:inline-block; font-family:var(--mono); font-size:9.5px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; padding:2px 8px; border-radius:3px; margin-bottom:8px; }
+.t-blue   { background:var(--blue-lt);   color:var(--blue); }
+.t-teal   { background:var(--teal-lt);   color:var(--teal); }
+.t-green  { background:var(--green-lt);  color:var(--green); }
+.t-amber  { background:var(--amber-lt);  color:var(--amber); }
+.t-red    { background:var(--red-lt);    color:var(--red); }
+.t-purple { background:var(--purple-lt); color:var(--purple); }
+.t-muted  { background:var(--s3);        color:var(--muted); }
+
+/* GRIDS */
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.g4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; }
+
+/* CODE */
+.code { background:var(--s1); border:1px solid var(--border); border-radius:4px; padding:18px 20px; font-family:var(--mono); font-size:12px; color:var(--muted); line-height:1.9; overflow-x:auto; margin:12px 0; }
+.code .kw  { color:#c792ea; }
+.code .cl  { color:var(--blue); }
+.code .fn  { color:var(--teal); }
+.code .st  { color:var(--green); }
+.code .cm  { color:var(--light); font-style:italic; }
+.code .nm  { color:var(--amber); }
+.code .kv  { color:var(--red); }
+.code .wh  { color:var(--ink2); }
+code { font-family:var(--mono); font-size:11.5px; background:var(--s2); border:1px solid var(--border2); border-radius:3px; padding:1px 6px; color:var(--blue); }
+
+/* NOTICE */
+.note { border-left:2px solid var(--blue); background:var(--blue-lt); padding:12px 14px; margin:12px 0; border-radius:0 3px 3px 0; }
+.note.amber { border-left-color:var(--amber); background:var(--amber-lt); }
+.note.red   { border-left-color:var(--red);   background:var(--red-lt); }
+.note.green { border-left-color:var(--green); background:var(--green-lt); }
+.note.teal  { border-left-color:var(--teal);  background:var(--teal-lt); }
+.note p { color:var(--ink2); font-size:13px; }
+
+/* TABLE */
+.tbl { background:var(--s1); border:1px solid var(--border); border-radius:4px; overflow:hidden; margin:12px 0; width:100%; }
+table { width:100%; border-collapse:collapse; font-size:12.5px; }
+thead th { background:var(--s2); color:var(--muted); padding:9px 13px; text-align:left; font-family:var(--mono); font-size:9.5px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; border-bottom:1px solid var(--border); }
+tbody td { padding:10px 13px; border-bottom:1px solid var(--border); color:var(--ink2); vertical-align:top; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover td { background:rgba(255,255,255,0.02); }
+td strong { color:var(--ink); }
+td code { font-size:11px; }
+
+/* LAYER BLOCK */
+.layer { border:1px solid var(--border); border-radius:6px; margin-bottom:14px; overflow:hidden; }
+.layer-header { background:var(--s2); padding:12px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); }
+.layer-num { font-family:var(--mono); font-size:10px; font-weight:600; color:var(--bg); background:var(--blue); border-radius:3px; padding:2px 8px; }
+.layer-name { font-weight:600; color:var(--ink); font-size:14px; }
+.layer-desc { font-size:12px; color:var(--muted); margin-left:auto; font-family:var(--mono); }
+.layer-body { padding:18px; }
+
+/* CLASS BLOCK */
+.cls { background:var(--s2); border:1px solid var(--border2); border-radius:4px; margin-bottom:10px; overflow:hidden; }
+.cls-header { padding:10px 14px; background:var(--s3); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.cls-type { font-family:var(--mono); font-size:9px; color:var(--purple); text-transform:uppercase; letter-spacing:0.1em; }
+.cls-name { font-family:var(--mono); font-size:13px; color:var(--teal); font-weight:500; }
+.cls-ns   { font-family:var(--mono); font-size:10px; color:var(--light); margin-left:auto; }
+.cls-body { padding:12px 14px; }
+.method { display:flex; align-items:flex-start; gap:10px; padding:7px 0; border-bottom:1px solid var(--border); font-size:12.5px; }
+.method:last-child { border-bottom:none; }
+.method-sig { font-family:var(--mono); font-size:11.5px; color:var(--ink2); flex:1; }
+.method-sig .ret { color:var(--amber); }
+.method-sig .name { color:var(--teal); }
+.method-sig .param { color:var(--blue); }
+.method-desc { font-size:12px; color:var(--muted); flex:0 0 220px; }
+
+/* RESPONSE */
+@media (max-width:900px) {
+  .sidebar { display:none; }
+  .main { margin-left:0; }
+  .hero, .sec { padding:36px 20px; }
+  .g2,.g3,.g4 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-title">ClarityClaim</div>
+    <div class="sb-ver">Low Level Design — v1.0</div>
+  </div>
+
+  <div class="sb-grp">
+    <div class="sb-grp-label">Overview</div>
+    <a href="#solution">Solution Structure</a>
+    <a href="#conventions">Naming Conventions</a>
+    <a href="#bestpractices">Best Practices</a>
+  </div>
+
+  <div class="sb-grp">
+    <div class="sb-grp-label">Layer 1 — Domain</div>
+    <a href="#domain-models">Domain Models</a>
+    <a href="#domain-dtos">Request / Response DTOs</a>
+    <a href="#domain-interfaces">Service Interfaces</a>
+    <a href="#domain-enums">Enums</a>
+  </div>
+
+  <div class="sb-grp">
+    <div class="sb-grp-label">Layer 2 — Infrastructure</div>
+    <a href="#infra-lmstudio">LM Studio Client</a>
+    <a href="#infra-whisper">Whisper STT Service</a>
+    <a href="#infra-fhir">FHIR Service</a>
+    <a href="#infra-rag">RAG / Vector Store</a>
+    <a href="#infra-pdf">PDF Indexing</a>
+  </div>
+
+  <div class="sb-grp">
+    <div class="sb-grp-label">Layer 3 — Services</div>
+    <a href="#svc-soap">SOAP Generation Service</a>
+    <a href="#svc-validation">Validation Service</a>
+    <a href="#svc-summary">Patient Summary Service</a>
+    <a href="#svc-regulatory">Regulatory Service</a>
+  </div>
+
+  <div class="sb-grp">
+    <div class="sb-grp-label">Layer 4 — API</div>
+    <a href="#api-controllers">Controllers</a>
+    <a href="#api-middleware">Middleware</a>
+    <a href="#api-di">Dependency Injection</a>
+    <a href="#api-cors">CORS & Config</a>
+  </div>
+
+  <div class="sb-grp">
+    <div class="sb-grp-label">Layer 5 — UI</div>
+    <a href="#ui-structure">Folder Structure</a>
+    <a href="#ui-state">State Management</a>
+    <a href="#ui-screen1">Screen 1 — Encounter</a>
+    <a href="#ui-screen2">Screen 2 — SOAP Note</a>
+    <a href="#ui-screen3">Screen 3 — Validation</a>
+    <a href="#ui-api">API Service Layer</a>
+  </div>
+
+  <div class="sb-grp">
+    <div class="sb-grp-label">Reference</div>
+    <a href="#policies">NCD/LCD Policy Files</a>
+    <a href="#prompts">Prompt Contracts</a>
+    <a href="#errors">Error Handling</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">ClarityClaim — Low Level Design v1.0</div>
+  <h1>Every class. Every method.<br><em>Every decision.</em></h1>
+  <p class="hero-desc">Complete developer-facing specification for all 5 layers of the ClarityClaim solution. Built from the HLD, the confirmed GPU model stack, and the 6 downloaded CMS NCD/LCD policy files. Hand this to your developers and start coding.</p>
+  <div class="chip-row">
+    <div class="chip hi">ASP.NET Core 10 Web API</div>
+    <div class="chip hi">React + Vite + Tailwind</div>
+    <div class="chip teal">Qwen3.6-35B × 2 Instances</div>
+    <div class="chip">Gemma4-26B Validator</div>
+    <div class="chip">Whisper.net CUDA</div>
+    <div class="chip">Microsoft.Extensions.VectorData</div>
+    <div class="chip">HAPI FHIR R4</div>
+    <div class="chip">6 CMS NCD/LCD PDFs</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SOLUTION STRUCTURE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="solution">
+  <div class="ey">Section 01</div>
+  <h2>Solution Structure</h2>
+  <p class="lead">5-project .NET solution + 1 React frontend. Each project has one responsibility. No circular dependencies. Domain has no references to anything — everything references Domain.</p>
+
+  <div class="code">
+<span class="cm">// Visual Studio Solution: ClarityClaim.sln</span>
+<span class="wh">ClarityClaim/</span>
+├── <span class="cl">ClarityClaim.Domain</span>        <span class="cm">// Models, DTOs, Interfaces, Enums — zero dependencies</span>
+├── <span class="cl">ClarityClaim.Infrastructure</span>  <span class="cm">// LMStudio, Whisper, FHIR, RAG — refs Domain only</span>
+├── <span class="cl">ClarityClaim.Services</span>        <span class="cm">// Business logic orchestration — refs Domain + Infrastructure</span>
+├── <span class="cl">ClarityClaim.API</span>             <span class="cm">// ASP.NET Core Web API — refs Services + Domain</span>
+├── <span class="cl">ClarityClaim.Tests</span>           <span class="cm">// xUnit test project — refs all layers</span>
+└── <span class="cl">clarity-claim-ui/</span>            <span class="cm">// React + Vite — separate, calls API via HTTP only</span>
+
+<span class="cm">// Dependency direction (never reverse this):
+// API → Services → Infrastructure → Domain
+// UI  → API (HTTP only, never direct reference)</span>
+  </div>
+
+  <div class="g4">
+    <div class="card blue-t" style="padding:16px;">
+      <div class="tag t-blue">Layer 1</div>
+      <h3 style="font-size:14px;">Domain</h3>
+      <p style="font-size:12px;">Pure C# models. No NuGet dependencies. Changes only when business concepts change.</p>
+    </div>
+    <div class="card teal-t" style="padding:16px;">
+      <div class="tag t-teal">Layer 2</div>
+      <h3 style="font-size:14px;">Infrastructure</h3>
+      <p style="font-size:12px;">All external integrations. LM Studio, Whisper, FHIR, VectorStore. Implements domain interfaces.</p>
+    </div>
+    <div class="card green-t" style="padding:16px;">
+      <div class="tag t-green">Layer 3</div>
+      <h3 style="font-size:14px;">Services</h3>
+      <p style="font-size:12px;">Orchestrates calls across infrastructure. Contains all business rules. No HTTP concerns here.</p>
+    </div>
+    <div class="card amber-t" style="padding:16px;">
+      <div class="tag t-amber">Layer 4</div>
+      <h3 style="font-size:14px;">API</h3>
+      <p style="font-size:12px;">Controllers only. Receives HTTP, calls services, returns responses. No business logic.</p>
+    </div>
+  </div>
+
+  <h4>NuGet Package References Per Project</h4>
+  <div class="tbl"><table>
+    <thead><tr><th>Project</th><th>NuGet Packages</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Domain</strong></td><td>None</td><td>Pure models — zero external dependencies</td></tr>
+      <tr><td><strong>Infrastructure</strong></td><td><code>Whisper.net</code> · <code>Whisper.net.Runtime.Cuda.Windows</code> · <code>Microsoft.Extensions.VectorData.Abstractions</code> · <code>Microsoft.SemanticKernel.Connectors.InMemory</code> · <code>Microsoft.Extensions.AI</code> · <code>PdfPig</code> · <code>System.Text.Json</code></td><td>All external I/O lives here</td></tr>
+      <tr><td><strong>Services</strong></td><td>None beyond transitive</td><td>Only references Infrastructure + Domain</td></tr>
+      <tr><td><strong>API</strong></td><td><code>Microsoft.AspNetCore</code> (built-in)</td><td>Minimal dependencies — thin layer</td></tr>
+      <tr><td><strong>Tests</strong></td><td><code>xunit</code> · <code>Moq</code> · <code>FluentAssertions</code></td><td>Unit + integration tests</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CONVENTIONS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="conventions">
+  <div class="ey">Section 02</div>
+  <h2>Naming Conventions & Best Practices</h2>
+  <p class="lead">All developers follow these rules without exception. Consistency removes the cognitive overhead of style decisions during a 48-hour build.</p>
+
+  <div class="g2">
+    <div>
+      <h4>C# Naming Rules</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>Element</th><th>Convention</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Classes / Records</td><td>PascalCase</td><td><code>SoapGenerationService</code></td></tr>
+          <tr><td>Interfaces</td><td>IPascalCase</td><td><code>ILanguageModelClient</code></td></tr>
+          <tr><td>Methods</td><td>PascalCase + Async suffix</td><td><code>GenerateSoapNoteAsync</code></td></tr>
+          <tr><td>Properties</td><td>PascalCase</td><td><code>ApprovalProbability</code></td></tr>
+          <tr><td>Private fields</td><td>_camelCase</td><td><code>_vectorStore</code></td></tr>
+          <tr><td>Parameters</td><td>camelCase</td><td><code>soapNote</code></td></tr>
+          <tr><td>Constants</td><td>UPPER_SNAKE</td><td><code>MAX_CHUNK_TOKENS</code></td></tr>
+          <tr><td>Enums</td><td>PascalCase</td><td><code>ValidationSeverity.Critical</code></td></tr>
+          <tr><td>DTOs (Request)</td><td>XXXRequest</td><td><code>GenerateSoapRequest</code></td></tr>
+          <tr><td>DTOs (Response)</td><td>XXXResponse</td><td><code>ValidationScoreResponse</code></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <h4>React / TypeScript Naming Rules</h4>
+      <div class="tbl"><table>
+        <thead><tr><th>Element</th><th>Convention</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Components</td><td>PascalCase.jsx</td><td><code>ApprovalGauge.jsx</code></td></tr>
+          <tr><td>Hooks</td><td>use + PascalCase</td><td><code>useClinicalRecord</code></td></tr>
+          <tr><td>Services</td><td>camelCase.js</td><td><code>api.js</code></td></tr>
+          <tr><td>State variables</td><td>camelCase</td><td><code>approvalScore</code></td></tr>
+          <tr><td>Event handlers</td><td>handle + PascalCase</td><td><code>handleGenerateClick</code></td></tr>
+          <tr><td>Props interfaces</td><td>XXXProps</td><td><code>GaugeProps</code></td></tr>
+          <tr><td>API functions</td><td>verb + Noun</td><td><code>generateSoap()</code></td></tr>
+          <tr><td>Screens folder</td><td>PascalCase</td><td><code>screens/EncounterCapture.jsx</code></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- BEST PRACTICES -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="bestpractices">
+  <div class="ey">Section 03</div>
+  <h2>Development Best Practices</h2>
+
+  <div class="g2">
+    <div class="card blue-t">
+      <div class="tag t-blue">BP-01 — Always Async</div>
+      <h3 style="font-size:14px;">Every I/O method must be async/await</h3>
+      <p style="font-size:12.5px;">Every call to LM Studio, FHIR, Whisper, and the vector store is I/O. Never block with <code>.Result</code> or <code>.Wait()</code>. All service methods return <code>Task&lt;T&gt;</code>. This keeps the ASP.NET thread pool free during the 20–30 second model inference wait.</p>
+    </div>
+    <div class="card teal-t">
+      <div class="tag t-teal">BP-02 — Typed JSON Only</div>
+      <h3 style="font-size:14px;">All LLM responses deserialised into typed classes</h3>
+      <p style="font-size:12.5px;">Never pass raw LLM string output to the frontend. Always deserialise into a C# record with <code>System.Text.Json</code>. Wrap every deserialisation in try/catch. If parsing fails, serve the pre-generated fallback JSON — never let a parse error reach the UI during a demo.</p>
+    </div>
+    <div class="card green-t">
+      <div class="tag t-green">BP-03 — Interface-First</div>
+      <h3 style="font-size:14px;">Code to interfaces, not concrete classes</h3>
+      <p style="font-size:12.5px;">Every infrastructure service implements an interface defined in Domain. <code>ILanguageModelClient</code>, <code>ITranscriptionService</code>, <code>IVectorStoreService</code>, <code>IFhirService</code>. Register interfaces in DI. Services never new up infrastructure — they receive via constructor injection only.</p>
+    </div>
+    <div class="card amber-t">
+      <div class="tag t-amber">BP-04 — Fallback First</div>
+      <h3 style="font-size:14px;">Pre-generate all demo outputs before hackathon</h3>
+      <p style="font-size:12.5px;">Save the SOAP note, validation result (74%), fixed validation (93%), and patient summary as JSON files in <code>/Data/Fallbacks/</code>. If any live inference call takes &gt;45 seconds or throws, the service silently returns the fallback. Add a boolean <code>_useFallback</code> flag in config for instant toggle.</p>
+    </div>
+    <div class="card purple-t">
+      <div class="tag t-purple">BP-05 — Temperature = 0.1</div>
+      <h3 style="font-size:14px;">Low temperature on all clinical inference calls</h3>
+      <p style="font-size:12.5px;">Use <code>temperature: 0.1</code> for all SOAP and validation calls. Clinical reasoning needs determinism, not creativity. Use <code>temperature: 0.3</code> only for the patient summary (Llama 1B) where a slightly varied but warm tone is acceptable.</p>
+    </div>
+    <div class="card red-t">
+      <div class="tag t-red">BP-06 — No Phi-2</div>
+      <h3 style="font-size:14px;">Phi-2 is excluded from all tasks</h3>
+      <p style="font-size:12.5px;"><code>phi-2 Q2_K</code> has a 2048-token context limit (shorter than a single SOAP note) and Q2 quantisation degrades clinical accuracy unacceptably. It must not be registered in DI or called from any service. If it appears in the model list, skip it.</p>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top:4px;">
+    <div class="card blue-t">
+      <div class="tag t-blue">BP-07 — Chunk at 1400 Tokens Max</div>
+      <p style="font-size:12.5px;">Nomic Embed has a hard 2048-token limit per call. Always chunk PDF text at 1400 tokens with 150-token overlap. Use <code>tiktoken</code> (not character count) to measure token length. Exceeding the limit silently truncates the embedding and degrades RAG retrieval quality.</p>
+    </div>
+    <div class="card teal-t">
+      <div class="tag t-teal">BP-08 — CORS Locked to localhost:5173</div>
+      <p style="font-size:12.5px;">Configure CORS in <code>Program.cs</code> to allow only <code>http://localhost:5173</code>. This prevents any accidental cross-origin call during the demo and signals security awareness to judges. Never use <code>AllowAnyOrigin()</code>.</p>
+    </div>
+    <div class="card green-t">
+      <div class="tag t-green">BP-09 — One HttpClient per Service</div>
+      <p style="font-size:12.5px;">Register <code>HttpClient</code> via <code>IHttpClientFactory</code> with named clients in DI: <code>"lmstudio"</code> and <code>"fhir"</code>. Never create <code>new HttpClient()</code> inline — socket exhaustion will crash the backend during repeated demo calls.</p>
+    </div>
+    <div class="card amber-t">
+      <div class="tag t-amber">BP-10 — SSE for Transcript Streaming</div>
+      <p style="font-size:12.5px;">The transcript endpoint must use Server-Sent Events (SSE), not WebSockets. Set <code>Content-Type: text/event-stream</code>. SSE is simpler, one-directional, and works through any proxy. The frontend uses the browser's native <code>EventSource</code> API — no library needed.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LAYER 1: DOMAIN -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="domain-models">
+  <div class="ey">Layer 01 — ClarityClaim.Domain</div>
+  <h2>Domain Models</h2>
+  <p class="lead">All C# records and classes that represent the business data. No logic — pure data containers. Used by every other layer.</p>
+
+  <div class="layer">
+    <div class="layer-header">
+      <div class="layer-num">MODEL</div>
+      <div class="layer-name">ClinicalRecord</div>
+      <div class="layer-desc">ClarityClaim.Domain.Models</div>
+    </div>
+    <div class="layer-body">
+      <p style="font-size:12.5px; margin-bottom:12px;">The master object that flows through the entire pipeline. Created empty in Screen 1, enriched at each stage, fully populated by Screen 3.</p>
+      <div class="code">
+<span class="kw">public record</span> <span class="cl">ClinicalRecord</span>
+{
+    <span class="kw">public</span> <span class="cl">string</span>             Id                { <span class="kw">get</span>; <span class="kw">init</span>; } = Guid.NewGuid().ToString();
+    <span class="kw">public</span> <span class="cl">FhirPatientContext</span> Patient           { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+    <span class="kw">public</span> <span class="cl">string</span>             Transcript        { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">SoapNote</span>           SoapNote          { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+    <span class="kw">public</span> <span class="cl">ValidationResult</span>   Validation        { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="kw">new</span>();
+    <span class="kw">public</span> <span class="cl">string</span>             PatientSummary    { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">DateTime</span>           CreatedAt         { <span class="kw">get</span>; <span class="kw">init</span>; } = DateTime.UtcNow;
+}
+
+<span class="kw">public record</span> <span class="cl">FhirPatientContext</span>
+{
+    <span class="kw">public</span> <span class="cl">string</span>              PatientId    { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">string</span>              FullName     { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">string</span>              DateOfBirth  { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">string</span>              Gender       { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> List&lt;<span class="cl">string</span>&gt;        Conditions   { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> List&lt;<span class="cl">string</span>&gt;        Medications  { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> List&lt;<span class="cl">string</span>&gt;        Allergies    { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+}
+
+<span class="kw">public record</span> <span class="cl">SoapNote</span>
+{
+    <span class="kw">public</span> <span class="cl">string</span>              Subjective         { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">string</span>              Objective          { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">string</span>              Assessment         { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> <span class="cl">string</span>              Plan               { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+    <span class="kw">public</span> List&lt;<span class="cl">CodedDiagnosis</span>&gt; Icd10Codes         { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> List&lt;<span class="cl">CodedProcedure</span>&gt; CptCodes           { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> <span class="cl">string</span>              ClinicalReasoning  { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+}
+
+<span class="kw">public record</span> <span class="cl">CodedDiagnosis</span>(
+    <span class="cl">string</span> Code,        <span class="cm">// e.g. "M51.16"</span>
+    <span class="cl">string</span> Description, <span class="cm">// e.g. "Intervertebral disc degeneration, lumbar region"</span>
+    <span class="cl">double</span> Confidence   <span class="cm">// 0.0 - 1.0</span>
+);
+
+<span class="kw">public record</span> <span class="cl">CodedProcedure</span>(
+    <span class="cl">string</span> Code,
+    <span class="cl">string</span> Description,
+    <span class="cl">double</span> Confidence
+);
+
+<span class="kw">public record</span> <span class="cl">ValidationResult</span>
+{
+    <span class="kw">public</span> <span class="cl">int</span>                     ApprovalProbability  { <span class="kw">get</span>; <span class="kw">set</span>; }  <span class="cm">// 0-100</span>
+    <span class="kw">public</span> List&lt;<span class="cl">ValidationGap</span>&gt;    Gaps                 { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> List&lt;<span class="cl">ValidationFix</span>&gt;    Fixes                { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> List&lt;<span class="cl">string</span>&gt;           PolicyReferences     { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> List&lt;<span class="cl">string</span>&gt;           PassingCriteria      { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+    <span class="kw">public</span> List&lt;<span class="cl">string</span>&gt;           HumanReviewFlags     { <span class="kw">get</span>; <span class="kw">set</span>; } = [];
+}
+
+<span class="kw">public record</span> <span class="cl">ValidationGap</span>(
+    <span class="cl">string</span>             PolicyRef,    <span class="cm">// "LCD L34220"</span>
+    <span class="cl">string</span>             Requirement,  <span class="cm">// "minimum 4 weeks conservative treatment"</span>
+    <span class="cl">string</span>             CurrentDoc,   <span class="cm">// what the SOAP note currently says</span>
+    <span class="cl">ValidationSeverity</span> Severity      <span class="cm">// Critical | Major | Minor</span>
+);
+
+<span class="kw">public record</span> <span class="cl">ValidationFix</span>(
+    <span class="cl">int</span>    GapIndex,
+    <span class="cl">string</span> SuggestedLanguage
+);
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" id="domain-dtos">
+    <div class="layer-header">
+      <div class="layer-num">DTO</div>
+      <div class="layer-name">Request / Response DTOs</div>
+      <div class="layer-desc">ClarityClaim.Domain.DTOs</div>
+    </div>
+    <div class="layer-body">
+      <div class="code">
+<span class="cm">// ── REQUEST DTOs ──────────────────────────────────────────</span>
+<span class="kw">public record</span> <span class="cl">GenerateSoapRequest</span>(
+    <span class="cl">string</span>             Transcript,
+    <span class="cl">FhirPatientContext</span> PatientContext
+);
+
+<span class="kw">public record</span> <span class="cl">ValidateDocumentRequest</span>(
+    <span class="cl">SoapNote</span>           SoapNote,
+    List&lt;<span class="cl">string</span>&gt;        Icd10Codes  <span class="cm">// ["M51.16", "M54.5"]</span>
+);
+
+<span class="kw">public record</span> <span class="cl">PatientSummaryRequest</span>(
+    <span class="cl">SoapNote</span>  SoapNote,
+    <span class="cl">string</span>    Language  <span class="cm">// "en" | "es" | "hi" | "zh"</span>
+);
+
+<span class="cm">// ── RESPONSE DTOs ─────────────────────────────────────────</span>
+<span class="kw">public record</span> <span class="cl">TranscriptResponse</span>(
+    <span class="cl">string</span>                    FullText,
+    List&lt;<span class="cl">TranscriptSegment</span>&gt;  Segments
+);
+<span class="kw">public record</span> <span class="cl">TranscriptSegment</span>(<span class="cl">double</span> Start, <span class="cl">double</span> End, <span class="cl">string</span> Text);
+
+<span class="kw">public record</span> <span class="cl">SoapResponse</span>(
+    <span class="cl">SoapNote</span> SoapNote,
+    <span class="cl">bool</span>     FromFallback  <span class="cm">// true if live inference failed</span>
+);
+
+<span class="kw">public record</span> <span class="cl">ValidationResponse</span>(
+    <span class="cl">ValidationResult</span> Result,
+    <span class="cl">bool</span>             FromFallback
+);
+
+<span class="kw">public record</span> <span class="cl">PatientSummaryResponse</span>(<span class="cl">string</span> SummaryText, <span class="cl">string</span> Language);
+
+<span class="kw">public record</span> <span class="cl">RegulatoryUpdate</span>(
+    <span class="cl">string</span> LcdId,
+    <span class="cl">string</span> Title,
+    <span class="cl">string</span> ChangeDescription,
+    <span class="cl">string</span> DetectedAt
+);
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" id="domain-interfaces">
+    <div class="layer-header">
+      <div class="layer-num">INTERFACE</div>
+      <div class="layer-name">Service Interfaces</div>
+      <div class="layer-desc">ClarityClaim.Domain.Interfaces</div>
+    </div>
+    <div class="layer-body">
+      <div class="code">
+<span class="kw">public interface</span> <span class="cl">ILanguageModelClient</span>
+{
+    Task&lt;<span class="cl">string</span>&gt; <span class="fn">CompleteAsync</span>(
+        <span class="cl">string</span>       modelId,
+        <span class="cl">string</span>       systemPrompt,
+        <span class="cl">string</span>       userPrompt,
+        <span class="cl">float</span>        temperature = <span class="nm">0.1f</span>,
+        <span class="cl">int</span>          maxTokens   = <span class="nm">4096</span>,
+        CancellationToken ct = <span class="kw">default</span>
+    );
+}
+
+<span class="kw">public interface</span> <span class="cl">ITranscriptionService</span>
+{
+    Task&lt;<span class="cl">TranscriptResponse</span>&gt; <span class="fn">TranscribeAsync</span>(<span class="cl">string</span> audioFilePath, CancellationToken ct = <span class="kw">default</span>);
+}
+
+<span class="kw">public interface</span> <span class="cl">IFhirService</span>
+{
+    Task&lt;<span class="cl">FhirPatientContext</span>&gt; <span class="fn">GetPatientContextAsync</span>(<span class="cl">string</span> patientId, CancellationToken ct = <span class="kw">default</span>);
+}
+
+<span class="kw">public interface</span> <span class="cl">IVectorStoreService</span>
+{
+    Task                       <span class="fn">IndexDocumentAsync</span>(<span class="cl">string</span> text, <span class="cl">string</span> source, <span class="cl">string</span> lcdId);
+    Task&lt;List&lt;<span class="cl">PolicyChunk</span>&gt;&gt;  <span class="fn">RetrieveAsync</span>(<span class="cl">string</span> query, <span class="cl">int</span> topK = <span class="nm">3</span>);
+}
+
+<span class="kw">public interface</span> <span class="cl">IPdfIndexingService</span>
+{
+    Task <span class="fn">IndexAllPoliciesAsync</span>(<span class="cl">string</span> policiesFolderPath);
+}
+
+<span class="kw">public record</span> <span class="cl">PolicyChunk</span>(<span class="cl">string</span> Text, <span class="cl">string</span> Source, <span class="cl">string</span> LcdId, <span class="cl">int</span> Page);
+      </div>
+    </div>
+  </div>
+
+  <div class="layer" id="domain-enums">
+    <div class="layer-header">
+      <div class="layer-num">ENUM</div>
+      <div class="layer-name">Enumerations</div>
+      <div class="layer-desc">ClarityClaim.Domain.Enums</div>
+    </div>
+    <div class="layer-body">
+      <div class="code">
+<span class="kw">public enum</span> <span class="cl">ValidationSeverity</span> { Critical = <span class="nm">3</span>, Major = <span class="nm">2</span>, Minor = <span class="nm">1</span> }
+<span class="kw">public enum</span> <span class="cl">ModelInstance</span>    { Qwen35B_120K, Qwen35B_240K, Gemma4_26B, Llama1B, Phi31Mini }
+<span class="kw">public enum</span> <span class="cl">SupportedLanguage</span> { En, Es, Hi, Zh, Fr }
+<span class="kw">public enum</span> <span class="cl">PolicyType</span>       { LCD, NCD, BillingArticle }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LAYER 2: INFRASTRUCTURE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="infra-lmstudio">
+  <div class="ey">Layer 02 — ClarityClaim.Infrastructure</div>
+  <h2>LM Studio / Bionic Client</h2>
+  <p class="lead">Single HTTP client that calls the Bionic (LM Studio) OpenAI-compatible API at <code>localhost:1234</code>. All model calls — Qwen, Gemma, Llama — go through this one class.</p>
+
+  <div class="note teal">
+    <p><strong>Model IDs confirmed from Models.txt:</strong> Instance 1 = <code>"qwen/qwen3.6-35b-a3b"</code> (120K ctx) · Instance 2 = <code>"qwen/qwen3.6-35b-a3b:2"</code> (240K ctx) · Gemma = <code>"google/gemma-4-26b-a4b-qat"</code> · Llama = <code>"llama-3.2-1b-instruct"</code> · Embedding = <code>"text-embedding-nomic-embed-text-v1.5"</code></p>
+  </div>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.Infrastructure/LmStudio/LmStudioClient.cs</span>
+<span class="kw">public class</span> <span class="cl">LmStudioClient</span> : <span class="cl">ILanguageModelClient</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">HttpClient</span>  _http;
+    <span class="kw">private const    string</span>       BASE_URL = <span class="st">"http://localhost:1234/v1"</span>;
+
+    <span class="cm">// Model ID constants — sourced directly from Models.txt</span>
+    <span class="kw">public static class</span> <span class="cl">Models</span>
+    {
+        <span class="kw">public const string</span> QWEN_120K  = <span class="st">"qwen/qwen3.6-35b-a3b"</span>;
+        <span class="kw">public const string</span> QWEN_240K  = <span class="st">"qwen/qwen3.6-35b-a3b:2"</span>;
+        <span class="kw">public const string</span> GEMMA      = <span class="st">"google/gemma-4-26b-a4b-qat"</span>;
+        <span class="kw">public const string</span> LLAMA_1B   = <span class="st">"llama-3.2-1b-instruct"</span>;
+        <span class="kw">public const string</span> NOMIC      = <span class="st">"text-embedding-nomic-embed-text-v1.5"</span>;
+        <span class="cm">// PHI_31_MINI only for fast classification, not clinical reasoning</span>
+        <span class="kw">public const string</span> PHI_MINI   = <span class="st">"phi-3.1-mini-4k-instruct"</span>;
+        <span class="cm">// PHI2 EXCLUDED — 2048 context, Q2 quant, unusable for healthcare</span>
+    }
+
+    <span class="kw">public</span> <span class="fn">LmStudioClient</span>(<span class="cl">IHttpClientFactory</span> factory)
+        => _http = factory.CreateClient(<span class="st">"lmstudio"</span>);
+
+    <span class="kw">public async</span> Task&lt;<span class="cl">string</span>&gt; <span class="fn">CompleteAsync</span>(
+        <span class="cl">string</span> modelId, <span class="cl">string</span> systemPrompt, <span class="cl">string</span> userPrompt,
+        <span class="cl">float</span>  temperature = <span class="nm">0.1f</span>, <span class="cl">int</span> maxTokens = <span class="nm">4096</span>,
+        CancellationToken ct = <span class="kw">default</span>)
+    {
+        <span class="kw">var</span> body = <span class="kw">new</span>
+        {
+            model       = modelId,
+            temperature = temperature,
+            max_tokens  = maxTokens,
+            messages = <span class="kw">new</span>[]
+            {
+                <span class="kw">new</span> { role = <span class="st">"system"</span>, content = systemPrompt },
+                <span class="kw">new</span> { role = <span class="st">"user"</span>,   content = userPrompt   }
+            }
+        };
+
+        <span class="kw">var</span> json = JsonSerializer.Serialize(body);
+        <span class="kw">var</span> content = <span class="kw">new</span> StringContent(json, Encoding.UTF8, <span class="st">"application/json"</span>);
+
+        <span class="kw">var</span> resp = <span class="kw">await</span> _http.PostAsync(<span class="st">$"{BASE_URL}/chat/completions"</span>, content, ct);
+        resp.EnsureSuccessStatusCode();
+
+        <span class="kw">var</span> result = <span class="kw">await</span> JsonSerializer.DeserializeAsync&lt;<span class="cl">LmStudioResponse</span>&gt;(
+            <span class="kw">await</span> resp.Content.ReadAsStreamAsync(ct), cancellationToken: ct);
+
+        <span class="kw">return</span> result?.Choices[<span class="nm">0</span>].Message.Content ?? <span class="cl">string</span>.Empty;
+    }
+
+    <span class="cm">// Embedding call — used by VectorStoreService for Nomic</span>
+    <span class="kw">public async</span> Task&lt;<span class="cl">float</span>[]&gt; <span class="fn">EmbedAsync</span>(<span class="cl">string</span> text, CancellationToken ct = <span class="kw">default</span>)
+    {
+        <span class="kw">var</span> body    = <span class="kw">new</span> { model = Models.NOMIC, input = text };
+        <span class="kw">var</span> content = <span class="kw">new</span> StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, <span class="st">"application/json"</span>);
+        <span class="kw">var</span> resp    = <span class="kw">await</span> _http.PostAsync(<span class="st">$"{BASE_URL}/embeddings"</span>, content, ct);
+        resp.EnsureSuccessStatusCode();
+        <span class="kw">var</span> result  = <span class="kw">await</span> JsonSerializer.DeserializeAsync&lt;<span class="cl">EmbeddingResponse</span>&gt;(
+            <span class="kw">await</span> resp.Content.ReadAsStreamAsync(ct), cancellationToken: ct);
+        <span class="kw">return</span> result?.Data[<span class="nm">0</span>].Embedding ?? [];
+    }
+}
+
+<span class="cm">// Response shape DTOs (internal to Infrastructure)</span>
+<span class="kw">internal record</span> <span class="cl">LmStudioResponse</span>(<span class="cl">LmChoice</span>[] Choices);
+<span class="kw">internal record</span> <span class="cl">LmChoice</span>(<span class="cl">LmMessage</span> Message);
+<span class="kw">internal record</span> <span class="cl">LmMessage</span>(<span class="cl">string</span> Role, <span class="cl">string</span> Content);
+<span class="kw">internal record</span> <span class="cl">EmbeddingResponse</span>(<span class="cl">EmbeddingData</span>[] Data);
+<span class="kw">internal record</span> <span class="cl">EmbeddingData</span>(<span class="cl">float</span>[] Embedding);
+  </div>
+</div>
+
+<!-- WHISPER -->
+<div class="sec" id="infra-whisper">
+  <div class="ey">Layer 02 — Infrastructure</div>
+  <h2>Whisper STT Service</h2>
+  <p class="lead">Wraps Whisper.net for local on-device transcription. Uses the medium GGML model at <code>/Data/Models/ggml-medium.bin</code>. CUDA runtime for GPU acceleration. Model loaded once at startup.</p>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.Infrastructure/Whisper/WhisperTranscriptionService.cs</span>
+<span class="kw">public class</span> <span class="cl">WhisperTranscriptionService</span> : <span class="cl">ITranscriptionService</span>, IAsyncDisposable
+{
+    <span class="kw">private</span> <span class="cl">WhisperFactory</span>?    _factory;
+    <span class="kw">private</span> <span class="cl">WhisperProcessor</span>? _processor;
+    <span class="kw">private readonly string</span>    _modelPath;
+
+    <span class="kw">public</span> <span class="fn">WhisperTranscriptionService</span>(<span class="cl">IConfiguration</span> config)
+        => _modelPath = config[<span class="st">"Whisper:ModelPath"</span>] ?? <span class="st">"Data/Models/ggml-medium.bin"</span>;
+
+    <span class="cm">// Called once during DI startup via IHostedService warm-up</span>
+    <span class="kw">public async</span> Task <span class="fn">InitialiseAsync</span>()
+    {
+        _factory   = WhisperFactory.FromPath(_modelPath);
+        _processor = <span class="kw">await</span> _factory.CreateBuilder()
+            .WithLanguage(<span class="st">"en"</span>)
+            .WithThreads(<span class="nm">4</span>)
+            .BuildAsync();
+    }
+
+    <span class="kw">public async</span> Task&lt;<span class="cl">TranscriptResponse</span>&gt; <span class="fn">TranscribeAsync</span>(
+        <span class="cl">string</span> audioFilePath, CancellationToken ct = <span class="kw">default</span>)
+    {
+        <span class="kw">if</span> (_processor <span class="kw">is null</span>) <span class="kw">await</span> <span class="fn">InitialiseAsync</span>();
+
+        <span class="kw">var</span> segments = <span class="kw">new</span> List&lt;<span class="cl">TranscriptSegment</span>&gt;();
+
+        <span class="kw">await foreach</span> (<span class="kw">var</span> seg <span class="kw">in</span> _processor!.ProcessAsync(audioFilePath, ct))
+        {
+            segments.Add(<span class="kw">new</span> <span class="cl">TranscriptSegment</span>(
+                seg.Start.TotalSeconds,
+                seg.End.TotalSeconds,
+                seg.Text.Trim()
+            ));
+        }
+
+        <span class="kw">var</span> fullText = <span class="cl">string</span>.Join(<span class="st">" "</span>, segments.Select(s => s.Text));
+        <span class="kw">return new</span> <span class="cl">TranscriptResponse</span>(fullText, segments);
+    }
+
+    <span class="kw">public async</span> ValueTask <span class="fn">DisposeAsync</span>()
+    {
+        <span class="kw">if</span> (_processor <span class="kw">is not null</span>) <span class="kw">await</span> _processor.DisposeAsync();
+        _factory?.Dispose();
+    }
+}
+  </div>
+</div>
+
+<!-- FHIR -->
+<div class="sec" id="infra-fhir">
+  <div class="ey">Layer 02 — Infrastructure</div>
+  <h2>FHIR Service</h2>
+  <p class="lead">Queries the HAPI FHIR R4 public test server for patient context. Serves from local JSON cache (<code>/Data/FHIR/</code>) when offline — which is always during the demo. Cache is populated once before the hackathon.</p>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.Infrastructure/Fhir/FhirService.cs</span>
+<span class="kw">public class</span> <span class="cl">FhirService</span> : <span class="cl">IFhirService</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">HttpClient</span>    _http;
+    <span class="kw">private readonly</span> <span class="cl">ILogger</span>      _logger;
+    <span class="kw">private readonly string</span>        _cacheDir;
+    <span class="kw">private const    string</span>        HAPI_BASE = <span class="st">"https://hapi.fhir.org/baseR4"</span>;
+
+    <span class="kw">public async</span> Task&lt;<span class="cl">FhirPatientContext</span>&gt; <span class="fn">GetPatientContextAsync</span>(
+        <span class="cl">string</span> patientId, CancellationToken ct = <span class="kw">default</span>)
+    {
+        <span class="cm">// Always try cache first — demo runs offline</span>
+        <span class="kw">var</span> cachePath = Path.Combine(_cacheDir, <span class="st">$"patient_{patientId}.json"</span>);
+        <span class="kw">if</span> (File.Exists(cachePath))
+        {
+            <span class="kw">var</span> cached = <span class="kw">await</span> File.ReadAllTextAsync(cachePath, ct);
+            <span class="kw">return</span> JsonSerializer.Deserialize&lt;<span class="cl">FhirPatientContext</span>&gt;(cached)!;
+        }
+
+        <span class="cm">// Live call — fetch, parse, write cache for future use</span>
+        <span class="kw">try</span>
+        {
+            <span class="kw">var</span> patient    = <span class="kw">await</span> <span class="fn">FetchFhirResourceAsync</span>(<span class="st">$"Patient/{patientId}"</span>, ct);
+            <span class="kw">var</span> conditions = <span class="kw">await</span> <span class="fn">FetchFhirResourceAsync</span>(<span class="st">$"Condition?patient={patientId}"</span>, ct);
+            <span class="kw">var</span> meds       = <span class="kw">await</span> <span class="fn">FetchFhirResourceAsync</span>(<span class="st">$"MedicationRequest?patient={patientId}"</span>, ct);
+            <span class="kw">var</span> allergies  = <span class="kw">await</span> <span class="fn">FetchFhirResourceAsync</span>(<span class="st">$"AllergyIntolerance?patient={patientId}"</span>, ct);
+
+            <span class="kw">var</span> context = <span class="fn">ParseFhirBundle</span>(patient, conditions, meds, allergies);
+            <span class="kw">await</span> File.WriteAllTextAsync(cachePath, JsonSerializer.Serialize(context), ct);
+            <span class="kw">return</span> context;
+        }
+        <span class="kw">catch</span> (<span class="cl">Exception</span> ex)
+        {
+            _logger.LogWarning(ex, <span class="st">"FHIR live call failed, returning empty context"</span>);
+            <span class="kw">return new</span> <span class="cl">FhirPatientContext</span> { PatientId = patientId };
+        }
+    }
+
+    <span class="kw">private static</span> <span class="cl">FhirPatientContext</span> <span class="fn">ParseFhirBundle</span>(
+        <span class="cl">JsonDocument</span> patient, <span class="cl">JsonDocument</span> conditions,
+        <span class="cl">JsonDocument</span> meds,    <span class="cl">JsonDocument</span> allergies)
+    {
+        <span class="cm">// Extract name from Patient resource name[0].text</span>
+        <span class="kw">var</span> name = patient.RootElement
+            .GetProperty(<span class="st">"name"</span>)[<span class="nm">0</span>]
+            .GetProperty(<span class="st">"text"</span>).GetString() ?? <span class="st">"Unknown"</span>;
+
+        <span class="kw">var</span> dob    = patient.RootElement.GetProperty(<span class="st">"birthDate"</span>).GetString() ?? <span class="st">""</span>;
+        <span class="kw">var</span> gender = patient.RootElement.GetProperty(<span class="st">"gender"</span>).GetString() ?? <span class="st">""</span>;
+
+        <span class="cm">// Extract conditions — entry[].resource.code.text</span>
+        <span class="kw">var</span> conditionList = conditions.RootElement
+            .GetProperty(<span class="st">"entry"</span>).EnumerateArray()
+            .Select(e => e.GetProperty(<span class="st">"resource"</span>)
+                          .GetProperty(<span class="st">"code"</span>)
+                          .GetProperty(<span class="st">"text"</span>).GetString() ?? <span class="st">""</span>)
+            .Where(s => !<span class="cl">string</span>.IsNullOrEmpty(s))
+            .ToList();
+
+        <span class="cm">// Similar extraction for medications and allergies</span>
+        <span class="kw">return new</span> <span class="cl">FhirPatientContext</span>
+        {
+            PatientId  = patient.RootElement.GetProperty(<span class="st">"id"</span>).GetString()!,
+            FullName   = name,
+            DateOfBirth= dob,
+            Gender     = gender,
+            Conditions = conditionList
+        };
+    }
+}
+  </div>
+</div>
+
+<!-- RAG -->
+<div class="sec" id="infra-rag">
+  <div class="ey">Layer 02 — Infrastructure</div>
+  <h2>RAG / Vector Store Service</h2>
+  <p class="lead">Wraps <code>Microsoft.Extensions.VectorData</code> with the InMemory provider. Embeds policy text via Nomic through LM Studio. Retrieved at validation time to ground Qwen's gap analysis in real CMS policy text.</p>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.Infrastructure/VectorStore/PolicyVectorStoreService.cs</span>
+<span class="kw">using</span> Microsoft.Extensions.VectorData;
+<span class="kw">using</span> Microsoft.SemanticKernel.Connectors.InMemory;
+
+<span class="cm">// The record stored in the vector collection</span>
+<span class="kw">public class</span> <span class="cl">PolicyVector</span>
+{
+    [<span class="cl">VectorStoreKey</span>]
+    <span class="kw">public</span> <span class="cl">string</span>   Id      { <span class="kw">get</span>; <span class="kw">set</span>; } = Guid.NewGuid().ToString();
+
+    [<span class="cl">VectorStoreData</span>]
+    <span class="kw">public</span> <span class="cl">string</span>   Text    { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty;
+
+    [<span class="cl">VectorStoreData</span>]
+    <span class="kw">public</span> <span class="cl">string</span>   Source  { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty; <span class="cm">// "LCD L34220"</span>
+
+    [<span class="cl">VectorStoreData</span>]
+    <span class="kw">public</span> <span class="cl">string</span>   LcdId   { <span class="kw">get</span>; <span class="kw">set</span>; } = <span class="cl">string</span>.Empty; <span class="cm">// "L34220"</span>
+
+    [<span class="cl">VectorStoreData</span>]
+    <span class="kw">public</span> <span class="cl">int</span>      Page    { <span class="kw">get</span>; <span class="kw">set</span>; }
+
+    [<span class="cl">VectorStoreVector</span>(<span class="nm">768</span>)]  <span class="cm">// Nomic v1.5 produces 768-dim embeddings</span>
+    <span class="kw">public</span> ReadOnlyMemory&lt;<span class="cl">float</span>&gt; Embedding { <span class="kw">get</span>; <span class="kw">set</span>; }
+}
+
+<span class="kw">public class</span> <span class="cl">PolicyVectorStoreService</span> : <span class="cl">IVectorStoreService</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">VectorStoreCollection</span>&lt;<span class="cl">string</span>, <span class="cl">PolicyVector</span>&gt; _collection;
+    <span class="kw">private readonly</span> <span class="cl">LmStudioClient</span>                            _lm;
+    <span class="kw">private const    int</span>                                        MAX_CHUNK_TOKENS = <span class="nm">1400</span>;
+
+    <span class="kw">public</span> <span class="fn">PolicyVectorStoreService</span>(<span class="cl">LmStudioClient</span> lm)
+    {
+        _lm = lm;
+        <span class="kw">var</span> store  = <span class="kw">new</span> <span class="cl">InMemoryVectorStore</span>();
+        _collection = store.GetCollection&lt;<span class="cl">string</span>, <span class="cl">PolicyVector</span>&gt;(<span class="st">"ncd_lcd_policies"</span>);
+        _collection.EnsureCollectionExistsAsync().GetAwaiter().GetResult();
+    }
+
+    <span class="kw">public async</span> Task <span class="fn">IndexDocumentAsync</span>(<span class="cl">string</span> text, <span class="cl">string</span> source, <span class="cl">string</span> lcdId)
+    {
+        <span class="kw">var</span> chunks = <span class="fn">ChunkText</span>(text, MAX_CHUNK_TOKENS, overlapTokens: <span class="nm">150</span>);
+
+        <span class="kw">foreach</span> (<span class="kw">var</span> (chunk, idx) <span class="kw">in</span> chunks.Select((c, i) => (c, i)))
+        {
+            <span class="kw">var</span> embedding = <span class="kw">await</span> _lm.EmbedAsync(chunk);
+            <span class="kw">await</span> _collection.UpsertAsync(<span class="kw">new</span> <span class="cl">PolicyVector</span>
+            {
+                Text      = chunk,
+                Source    = source,
+                LcdId     = lcdId,
+                Page      = idx,
+                Embedding = <span class="kw">new</span> ReadOnlyMemory&lt;<span class="cl">float</span>&gt;(embedding)
+            });
+        }
+    }
+
+    <span class="kw">public async</span> Task&lt;List&lt;<span class="cl">PolicyChunk</span>&gt;&gt; <span class="fn">RetrieveAsync</span>(<span class="cl">string</span> query, <span class="cl">int</span> topK = <span class="nm">3</span>)
+    {
+        <span class="kw">var</span> queryEmbedding = <span class="kw">await</span> _lm.EmbedAsync(query);
+
+        <span class="kw">var</span> results = <span class="kw">await</span> _collection
+            .SearchAsync(<span class="kw">new</span> ReadOnlyMemory&lt;<span class="cl">float</span>&gt;(queryEmbedding), topK)
+            .ToListAsync();
+
+        <span class="kw">return</span> results
+            .Select(r => <span class="kw">new</span> <span class="cl">PolicyChunk</span>(r.Record.Text, r.Record.Source, r.Record.LcdId, r.Record.Page))
+            .ToList();
+    }
+
+    <span class="cm">// Simple word-boundary chunking with overlap</span>
+    <span class="kw">private static</span> List&lt;<span class="cl">string</span>&gt; <span class="fn">ChunkText</span>(<span class="cl">string</span> text, <span class="cl">int</span> maxTokens, <span class="cl">int</span> overlapTokens)
+    {
+        <span class="cm">// Approximate: 1 token ≈ 4 characters. Use tiktoken in production.</span>
+        <span class="kw">var</span> approxChunkSize   = maxTokens * <span class="nm">4</span>;
+        <span class="kw">var</span> approxOverlapSize = overlapTokens * <span class="nm">4</span>;
+        <span class="kw">var</span> chunks = <span class="kw">new</span> List&lt;<span class="cl">string</span>&gt;();
+        <span class="kw">var</span> start  = <span class="nm">0</span>;
+
+        <span class="kw">while</span> (start &lt; text.Length)
+        {
+            <span class="kw">var</span> end   = Math.Min(start + approxChunkSize, text.Length);
+            <span class="kw">var</span> chunk = text[start..end];
+            chunks.Add(chunk);
+            start += approxChunkSize - approxOverlapSize;
+        }
+        <span class="kw">return</span> chunks;
+    }
+}
+  </div>
+</div>
+
+<!-- PDF INDEXING -->
+<div class="sec" id="infra-pdf">
+  <div class="ey">Layer 02 — Infrastructure</div>
+  <h2>PDF Indexing Service</h2>
+  <p class="lead">Reads the 6 NCD/LCD policy PDFs from <code>/Data/Policies/</code> using PdfPig, extracts text, and indexes into the vector store. Runs once on application startup.</p>
+
+  <div class="note amber">
+    <p><strong>Confirmed PDF files in /Data/Policies/:</strong> L34220_lumbar_mri_lcd.pdf · L36839_sleep_studies_lcd.pdf · L39266_cognitive_assessment_lcd.pdf · A56903_sleep_studies_codes.pdf · A59036_cognitive_assessment_codes.pdf — All 6 downloaded and confirmed.</p>
+  </div>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.Infrastructure/Pdf/PdfIndexingService.cs</span>
+<span class="kw">using</span> UglyToad.PdfPig;
+
+<span class="kw">public class</span> <span class="cl">PdfIndexingService</span> : <span class="cl">IPdfIndexingService</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">IVectorStoreService</span> _vectorStore;
+    <span class="kw">private readonly</span> <span class="cl">ILogger</span>            _logger;
+
+    <span class="cm">// Maps filename prefix to LCD ID for metadata</span>
+    <span class="kw">private static readonly</span> Dictionary&lt;<span class="cl">string</span>, <span class="cl">string</span>&gt; LCD_MAP = <span class="kw">new</span>()
+    {
+        { <span class="st">"L34220"</span>, <span class="st">"LCD L34220 — Lumbar MRI"</span>                          },
+        { <span class="st">"L36839"</span>, <span class="st">"LCD L36839 — Polysomnography & Sleep Studies"</span>     },
+        { <span class="st">"L39266"</span>, <span class="st">"LCD L39266 — Cognitive Assessment"</span>                },
+        { <span class="st">"A56903"</span>, <span class="st">"Article A56903 — Sleep Studies Billing & Coding"</span>  },
+        { <span class="st">"A59036"</span>, <span class="st">"Article A59036 — Cognitive Assessment Coding"</span>    }
+    };
+
+    <span class="kw">public async</span> Task <span class="fn">IndexAllPoliciesAsync</span>(<span class="cl">string</span> policiesFolderPath)
+    {
+        <span class="kw">var</span> pdfFiles = Directory.GetFiles(policiesFolderPath, <span class="st">"*.pdf"</span>);
+
+        <span class="kw">foreach</span> (<span class="kw">var</span> filePath <span class="kw">in</span> pdfFiles)
+        {
+            <span class="kw">var</span> fileName = Path.GetFileNameWithoutExtension(filePath);
+            <span class="kw">var</span> lcdId    = LCD_MAP.Keys.FirstOrDefault(k => fileName.StartsWith(k)) ?? fileName;
+            <span class="kw">var</span> source   = LCD_MAP.GetValueOrDefault(lcdId, fileName);
+
+            _logger.LogInformation(<span class="st">"Indexing policy: {Source}"</span>, source);
+
+            <span class="kw">var</span> text = <span class="fn">ExtractPdfText</span>(filePath);
+            <span class="kw">await</span> _vectorStore.IndexDocumentAsync(text, source, lcdId);
+
+            _logger.LogInformation(<span class="st">"Indexed {Source} — {Chars} chars"</span>, source, text.Length);
+        }
+    }
+
+    <span class="kw">private static string</span> <span class="fn">ExtractPdfText</span>(<span class="cl">string</span> filePath)
+    {
+        <span class="kw">using var</span> doc = PdfDocument.Open(filePath);
+        <span class="kw">var</span> sb = <span class="kw">new</span> StringBuilder();
+
+        <span class="kw">foreach</span> (<span class="kw">var</span> page <span class="kw">in</span> doc.GetPages())
+            sb.AppendLine(page.Text);
+
+        <span class="kw">return</span> sb.ToString();
+    }
+}
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LAYER 3: SERVICES -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="svc-soap">
+  <div class="ey">Layer 03 — ClarityClaim.Services</div>
+  <h2>SOAP Generation Service — PS 37</h2>
+  <p class="lead">Orchestrates transcript + FHIR context → Qwen Instance 1 (120K) → structured SOAP note + ICD-10/CPT codes. Falls back to pre-generated JSON if inference fails.</p>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.Services/SoapGenerationService.cs</span>
+<span class="kw">public class</span> <span class="cl">SoapGenerationService</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">ILanguageModelClient</span> _lm;
+    <span class="kw">private readonly</span> <span class="cl">IConfiguration</span>       _config;
+
+    <span class="kw">public async</span> Task&lt;<span class="cl">SoapResponse</span>&gt; <span class="fn">GenerateAsync</span>(
+        <span class="cl">GenerateSoapRequest</span> req, CancellationToken ct = <span class="kw">default</span>)
+    {
+        <span class="kw">try</span>
+        {
+            <span class="kw">var</span> systemPrompt = <span class="fn">BuildSystemPrompt</span>();
+            <span class="kw">var</span> userPrompt   = <span class="fn">BuildUserPrompt</span>(req.Transcript, req.PatientContext);
+
+            <span class="kw">var</span> raw = <span class="kw">await</span> _lm.CompleteAsync(
+                <span class="cl">LmStudioClient.Models</span>.QWEN_120K,
+                systemPrompt, userPrompt,
+                temperature: <span class="nm">0.1f</span>, maxTokens: <span class="nm">4096</span>, ct: ct
+            );
+
+            <span class="kw">var</span> note = <span class="fn">ParseSoapJson</span>(raw);
+            <span class="kw">return new</span> <span class="cl">SoapResponse</span>(note, FromFallback: <span class="kw">false</span>);
+        }
+        <span class="kw">catch</span> (<span class="cl">Exception</span> ex)
+        {
+            <span class="kw">return new</span> <span class="cl">SoapResponse</span>(<span class="fn">LoadFallback</span>(), FromFallback: <span class="kw">true</span>);
+        }
+    }
+
+    <span class="kw">private static string</span> <span class="fn">BuildSystemPrompt</span>() => <span class="st">"""
+        You are a clinical documentation specialist. Generate structured SOAP notes
+        from doctor-patient encounter transcripts. Output valid JSON only.
+        Use ICD-10 codes at the highest specificity — never unspecified codes.
+        Prefer M51.16 over M54.5 (unspecified low back pain) when radiculopathy
+        or disc pathology is documented. Always link codes to transcript evidence.
+        """</span>;
+
+    <span class="kw">private static string</span> <span class="fn">BuildUserPrompt</span>(<span class="cl">string</span> transcript, <span class="cl">FhirPatientContext</span> ctx) => <span class="st">$"""
+        PATIENT CONTEXT:
+        Name: {ctx.FullName} | DOB: {ctx.DateOfBirth} | Gender: {ctx.Gender}
+        Existing Conditions: {string.Join(", ", ctx.Conditions)}
+        Current Medications: {string.Join(", ", ctx.Medications)}
+        Known Allergies: {string.Join(", ", ctx.Allergies)}
+
+        ENCOUNTER TRANSCRIPT:
+        {transcript}
+
+        Return ONLY this JSON:
+        {{
+          "subjective": "...",
+          "objective": "...",
+          "assessment": "...",
+          "plan": "...",
+          "icd10_codes": [{{"code":"M51.16","description":"...","confidence":0.94}}],
+          "cpt_codes": [{{"code":"72148","description":"...","confidence":0.91}}],
+          "clinical_reasoning": "..."
+        }}
+        """</span>;
+
+    <span class="kw">private static</span> <span class="cl">SoapNote</span> <span class="fn">ParseSoapJson</span>(<span class="cl">string</span> raw)
+    {
+        <span class="cm">// Strip any markdown code fences the model may add</span>
+        <span class="kw">var</span> clean = raw.Trim().TrimStart('`').TrimEnd('`');
+        <span class="kw">if</span> (clean.StartsWith(<span class="st">"json"</span>, StringComparison.OrdinalIgnoreCase))
+            clean = clean[<span class="nm">4</span>..].Trim();
+
+        <span class="kw">var</span> opts = <span class="kw">new</span> JsonSerializerOptions { PropertyNameCaseInsensitive = <span class="kw">true</span> };
+        <span class="kw">return</span> JsonSerializer.Deserialize&lt;<span class="cl">SoapNote</span>&gt;(clean, opts)
+            ?? <span class="kw">throw new</span> <span class="cl">InvalidOperationException</span>(<span class="st">"Failed to parse SOAP JSON"</span>);
+    }
+}
+  </div>
+</div>
+
+<!-- VALIDATION SERVICE -->
+<div class="sec" id="svc-validation">
+  <div class="ey">Layer 03 — Services</div>
+  <h2>Validation Service — PS 39</h2>
+  <p class="lead">The core of the product. Retrieves relevant NCD/LCD policy chunks via RAG, calls Qwen Instance 2 (240K) for primary gap analysis, Gemma4 for independent second-pass, merges scores with weighted average (0.6 / 0.4), and returns a full scorecard.</p>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.Services/ValidationService.cs</span>
+<span class="kw">public class</span> <span class="cl">ValidationService</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">ILanguageModelClient</span>  _lm;
+    <span class="kw">private readonly</span> <span class="cl">IVectorStoreService</span>  _vs;
+
+    <span class="kw">public async</span> Task&lt;<span class="cl">ValidationResponse</span>&gt; <span class="fn">ValidateAsync</span>(
+        <span class="cl">ValidateDocumentRequest</span> req, CancellationToken ct = <span class="kw">default</span>)
+    {
+        <span class="kw">try</span>
+        {
+            <span class="cm">// Step 1: RAG retrieval — query using ICD codes + "medical necessity"</span>
+            <span class="kw">var</span> query  = <span class="st">$"{string.Join(" ", req.Icd10Codes)} medical necessity documentation requirements"</span>;
+            <span class="kw">var</span> chunks = <span class="kw">await</span> _vs.RetrieveAsync(query, topK: <span class="nm">3</span>);
+
+            <span class="kw">var</span> policyContext = <span class="fn">BuildPolicyContext</span>(chunks);
+            <span class="kw">var</span> soapText      = <span class="fn">SoapToText</span>(req.SoapNote);
+
+            <span class="cm">// Step 2: Run Qwen and Gemma in parallel for speed</span>
+            <span class="kw">var</span> qwenTask  = <span class="fn">RunQwenValidationAsync</span>(soapText, policyContext, ct);
+            <span class="kw">var</span> gemmaTask = <span class="fn">RunGemmaValidationAsync</span>(soapText, policyContext, ct);
+            <span class="kw">await</span> Task.WhenAll(qwenTask, gemmaTask);
+
+            <span class="kw">var</span> qwenResult  = qwenTask.Result;
+            <span class="kw">var</span> gemmaResult = gemmaTask.Result;
+
+            <span class="cm">// Step 3: Merge — Qwen weighted 0.6, Gemma 0.4</span>
+            <span class="kw">var</span> mergedScore = (<span class="cl">int</span>)Math.Round(
+                qwenResult.ApprovalScore * <span class="nm">0.6</span> +
+                gemmaResult.ApprovalScore * <span class="nm">0.4</span>
+            );
+
+            <span class="cm">// Step 4: Flag disagreements — where models differ by >20 points</span>
+            <span class="kw">var</span> flags = Math.Abs(qwenResult.ApprovalScore - gemmaResult.ApprovalScore) > <span class="nm">20</span>
+                ? [<span class="st">"Models disagree significantly — human review recommended"</span>]
+                : (<span class="cl">List</span>&lt;<span class="cl">string</span>&gt;)[];
+
+            <span class="kw">return new</span> <span class="cl">ValidationResponse</span>(
+                <span class="kw">new</span> <span class="cl">ValidationResult</span>
+                {
+                    ApprovalProbability = mergedScore,
+                    Gaps                = qwenResult.Gaps,
+                    Fixes               = qwenResult.Fixes,
+                    PolicyReferences    = chunks.Select(c => <span class="st">$"{c.Source} p.{c.Page}"</span>).ToList(),
+                    PassingCriteria     = qwenResult.PassingCriteria,
+                    HumanReviewFlags    = flags
+                },
+                FromFallback: <span class="kw">false</span>
+            );
+        }
+        <span class="kw">catch</span> (<span class="cl">Exception</span> ex)
+        {
+            <span class="kw">return new</span> <span class="cl">ValidationResponse</span>(<span class="fn">LoadFallbackValidation</span>(), FromFallback: <span class="kw">true</span>);
+        }
+    }
+
+    <span class="kw">private async</span> Task&lt;<span class="cl">LlmValidationOutput</span>&gt; <span class="fn">RunQwenValidationAsync</span>(
+        <span class="cl">string</span> soapText, <span class="cl">string</span> policyContext, CancellationToken ct)
+    {
+        <span class="kw">var</span> raw = <span class="kw">await</span> _lm.CompleteAsync(
+            <span class="cl">LmStudioClient.Models</span>.QWEN_240K,  <span class="cm">// 240K context fits full policy docs</span>
+            VALIDATION_SYSTEM_PROMPT,
+            <span class="fn">BuildValidationUserPrompt</span>(soapText, policyContext),
+            temperature: <span class="nm">0.1f</span>, maxTokens: <span class="nm">3000</span>, ct: ct
+        );
+        <span class="kw">return</span> <span class="fn">ParseValidationJson</span>(raw);
+    }
+
+    <span class="kw">private async</span> Task&lt;<span class="cl">LlmValidationOutput</span>&gt; <span class="fn">RunGemmaValidationAsync</span>(
+        <span class="cl">string</span> soapText, <span class="cl">string</span> policyContext, CancellationToken ct)
+    {
+        <span class="kw">var</span> raw = <span class="kw">await</span> _lm.CompleteAsync(
+            <span class="cl">LmStudioClient.Models</span>.GEMMA,
+            VALIDATION_SYSTEM_PROMPT,
+            <span class="fn">BuildValidationUserPrompt</span>(soapText, policyContext),
+            temperature: <span class="nm">0.1f</span>, maxTokens: <span class="nm">2000</span>, ct: ct
+        );
+        <span class="kw">return</span> <span class="fn">ParseValidationJson</span>(raw);
+    }
+
+    <span class="kw">private const string</span> VALIDATION_SYSTEM_PROMPT = <span class="st">"""
+        You are a medical billing compliance specialist.
+        Evaluate clinical documentation against CMS NCD/LCD coverage criteria.
+        Identify exactly what is missing, insufficient, or inconsistent.
+        Output valid JSON only. No markdown, no explanation outside the JSON.
+        """</span>;
+}
+
+<span class="cm">// Internal parse target — not exposed outside Services layer</span>
+<span class="kw">internal record</span> <span class="cl">LlmValidationOutput</span>(
+    <span class="cl">int</span>                    ApprovalScore,
+    List&lt;<span class="cl">ValidationGap</span>&gt;  Gaps,
+    List&lt;<span class="cl">ValidationFix</span>&gt;  Fixes,
+    List&lt;<span class="cl">string</span>&gt;         PassingCriteria
+);
+  </div>
+</div>
+
+<!-- PATIENT SUMMARY -->
+<div class="sec" id="svc-summary">
+  <div class="ey">Layer 03 — Services</div>
+  <h2>Patient Summary Service</h2>
+  <div class="code">
+<span class="cm">// ClarityClaim.Services/PatientSummaryService.cs</span>
+<span class="kw">public class</span> <span class="cl">PatientSummaryService</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">ILanguageModelClient</span> _lm;
+
+    <span class="kw">public async</span> Task&lt;<span class="cl">PatientSummaryResponse</span>&gt; <span class="fn">SummariseAsync</span>(
+        <span class="cl">PatientSummaryRequest</span> req, CancellationToken ct = <span class="kw">default</span>)
+    {
+        <span class="kw">var</span> systemPrompt = <span class="st">$"""
+            Explain medical information in simple, friendly language.
+            Write in {req.Language}. Avoid jargon. Be warm and reassuring.
+            Output plain text only — no JSON, no bullet points, no headers.
+            """</span>;
+
+        <span class="kw">var</span> userPrompt = <span class="st">$"""
+            Write a 3-sentence plain-language summary of today's appointment
+            for the patient. Include: what the diagnosis means in simple terms,
+            what medication or treatment was discussed, and what to do next.
+
+            CLINICAL NOTE:
+            Assessment: {req.SoapNote.Assessment}
+            Plan: {req.SoapNote.Plan}
+            """</span>;
+
+        <span class="cm">// Use Llama 1B — fast, low resource, adequate for plain-language summaries</span>
+        <span class="kw">var</span> summary = <span class="kw">await</span> _lm.CompleteAsync(
+            <span class="cl">LmStudioClient.Models</span>.LLAMA_1B,
+            systemPrompt, userPrompt,
+            temperature: <span class="nm">0.3f</span>, maxTokens: <span class="nm">300</span>, ct: ct
+        );
+
+        <span class="kw">return new</span> <span class="cl">PatientSummaryResponse</span>(summary.Trim(), req.Language);
+    }
+}
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LAYER 4: API -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="api-controllers">
+  <div class="ey">Layer 04 — ClarityClaim.API</div>
+  <h2>API Controllers</h2>
+  <p class="lead">Thin controllers. Receive HTTP, call one service method, return result. No business logic here. All at <code>localhost:8000/api/</code>.</p>
+
+  <div class="code">
+<span class="cm">// ClarityClaim.API/Controllers/ClinicalController.cs</span>
+[<span class="cl">ApiController</span>]
+[<span class="cl">Route</span>(<span class="st">"api"</span>)]
+<span class="kw">public class</span> <span class="cl">ClinicalController</span> : <span class="cl">ControllerBase</span>
+{
+    <span class="kw">private readonly</span> <span class="cl">SoapGenerationService</span>  _soapSvc;
+    <span class="kw">private readonly</span> <span class="cl">ValidationService</span>       _validSvc;
+    <span class="kw">private readonly</span> <span class="cl">PatientSummaryService</span>   _summarySvc;
+    <span class="kw">private readonly</span> <span class="cl">IFhirService</span>            _fhirSvc;
+    <span class="kw">private readonly</span> <span class="cl">ITranscriptionService</span>   _sttSvc;
+    <span class="kw">private readonly</span> <span class="cl">ILogger</span>&lt;<span class="cl">ClinicalController</span>&gt; _logger;
+
+    <span class="cm">// ── GET /api/patient/{id} ───────────────────────────────</span>
+    [<span class="cl">HttpGet</span>(<span class="st">"patient/{patientId}"</span>)]
+    <span class="kw">public async</span> Task&lt;<span class="cl">IActionResult</span>&gt; <span class="fn">GetPatient</span>(<span class="cl">string</span> patientId, CancellationToken ct)
+    {
+        <span class="kw">var</span> result = <span class="kw">await</span> _fhirSvc.GetPatientContextAsync(patientId, ct);
+        <span class="kw">return</span> Ok(result);
+    }
+
+    <span class="cm">// ── POST /api/transcribe ────────────────────────────────</span>
+    [<span class="cl">HttpPost</span>(<span class="st">"transcribe"</span>)]
+    <span class="kw">public async</span> Task&lt;<span class="cl">IActionResult</span>&gt; <span class="fn">Transcribe</span>([<span class="cl">FromForm</span>] <span class="cl">IFormFile</span> audio, CancellationToken ct)
+    {
+        <span class="kw">var</span> tmpPath = Path.Combine(Path.GetTempPath(), <span class="st">$"{Guid.NewGuid()}.wav"</span>);
+        <span class="kw">await using</span> (<span class="kw">var</span> stream = <span class="kw">new</span> FileStream(tmpPath, FileMode.Create))
+            <span class="kw">await</span> audio.CopyToAsync(stream, ct);
+
+        <span class="kw">var</span> result = <span class="kw">await</span> _sttSvc.TranscribeAsync(tmpPath, ct);
+        System.IO.File.Delete(tmpPath);
+        <span class="kw">return</span> Ok(result);
+    }
+
+    <span class="cm">// ── POST /api/generate-soap ─────────────────────────────</span>
+    [<span class="cl">HttpPost</span>(<span class="st">"generate-soap"</span>)]
+    <span class="kw">public async</span> Task&lt;<span class="cl">IActionResult</span>&gt; <span class="fn">GenerateSoap</span>(
+        [<span class="cl">FromBody</span>] <span class="cl">GenerateSoapRequest</span> req, CancellationToken ct)
+    {
+        <span class="kw">var</span> result = <span class="kw">await</span> _soapSvc.GenerateAsync(req, ct);
+        <span class="kw">return</span> Ok(result);
+    }
+
+    <span class="cm">// ── POST /api/validate ──────────────────────────────────</span>
+    [<span class="cl">HttpPost</span>(<span class="st">"validate"</span>)]
+    <span class="kw">public async</span> Task&lt;<span class="cl">IActionResult</span>&gt; <span class="fn">Validate</span>(
+        [<span class="cl">FromBody</span>] <span class="cl">ValidateDocumentRequest</span> req, CancellationToken ct)
+    {
+        <span class="kw">var</span> result = <span class="kw">await</span> _validSvc.ValidateAsync(req, ct);
+        <span class="kw">return</span> Ok(result);
+    }
+
+    <span class="cm">// ── POST /api/patient-summary ───────────────────────────</span>
+    [<span class="cl">HttpPost</span>(<span class="st">"patient-summary"</span>)]
+    <span class="kw">public async</span> Task&lt;<span class="cl">IActionResult</span>&gt; <span class="fn">PatientSummary</span>(
+        [<span class="cl">FromBody</span>] <span class="cl">PatientSummaryRequest</span> req, CancellationToken ct)
+    {
+        <span class="kw">var</span> result = <span class="kw">await</span> _summarySvc.SummariseAsync(req, ct);
+        <span class="kw">return</span> Ok(result);
+    }
+
+    <span class="cm">// ── GET /api/regulatory ─────────────────────────────────</span>
+    [<span class="cl">HttpGet</span>(<span class="st">"regulatory"</span>)]
+    <span class="kw">public</span> <span class="cl">IActionResult</span> <span class="fn">RegulatoryUpdates</span>()
+    {
+        <span class="cm">// Static mock for demo — shows PS 35 capability</span>
+        <span class="kw">var</span> updates = <span class="kw">new</span>[]
+        {
+            <span class="kw">new</span> <span class="cl">RegulatoryUpdate</span>(<span class="st">"L39266"</span>, <span class="st">"Cognitive Assessment"</span>,
+                <span class="st">"Coverage criteria expanded — new dementia staging tools accepted"</span>,
+                DateTime.UtcNow.AddHours(-<span class="nm">6</span>).ToString(<span class="st">"O"</span>)),
+            <span class="kw">new</span> <span class="cl">RegulatoryUpdate</span>(<span class="st">"L36839"</span>, <span class="st">"Sleep Studies"</span>,
+                <span class="st">"Documentation requirements tightened — accreditation proof required"</span>,
+                DateTime.UtcNow.AddHours(-<span class="nm">14</span>).ToString(<span class="st">"O"</span>))
+        };
+        <span class="kw">return</span> Ok(updates);
+    }
+}
+  </div>
+
+  <div class="sec" id="api-di" style="padding:28px 0 0; border:none;">
+    <h3>Program.cs — Dependency Injection & Startup</h3>
+    <div class="code">
+<span class="cm">// ClarityClaim.API/Program.cs</span>
+<span class="kw">var</span> builder = WebApplication.CreateBuilder(args);
+
+<span class="cm">// HTTP Clients — named, managed via factory (never new HttpClient())</span>
+builder.Services.AddHttpClient(<span class="st">"lmstudio"</span>, c => {
+    c.BaseAddress = <span class="kw">new</span> Uri(<span class="st">"http://localhost:1234"</span>);
+    c.Timeout      = TimeSpan.FromSeconds(<span class="nm">120</span>); <span class="cm">// LLM inference can take 30-40s</span>
+});
+builder.Services.AddHttpClient(<span class="st">"fhir"</span>, c => {
+    c.BaseAddress = <span class="kw">new</span> Uri(<span class="st">"https://hapi.fhir.org"</span>);
+    c.Timeout      = TimeSpan.FromSeconds(<span class="nm">15</span>);
+});
+
+<span class="cm">// Infrastructure — singletons (expensive to create, safe to reuse)</span>
+builder.Services.AddSingleton&lt;<span class="cl">LmStudioClient</span>&gt;();
+builder.Services.AddSingleton&lt;<span class="cl">IVectorStoreService</span>, <span class="cl">PolicyVectorStoreService</span>&gt;();
+builder.Services.AddSingleton&lt;<span class="cl">IPdfIndexingService</span>, <span class="cl">PdfIndexingService</span>&gt;();
+builder.Services.AddSingleton&lt;<span class="cl">ITranscriptionService</span>, <span class="cl">WhisperTranscriptionService</span>&gt;();
+builder.Services.AddSingleton&lt;<span class="cl">IFhirService</span>,          <span class="cl">FhirService</span>&gt;();
+
+<span class="cm">// Services — scoped per request</span>
+builder.Services.AddScoped&lt;<span class="cl">SoapGenerationService</span>&gt;();
+builder.Services.AddScoped&lt;<span class="cl">ValidationService</span>&gt;();
+builder.Services.AddScoped&lt;<span class="cl">PatientSummaryService</span>&gt;();
+
+<span class="cm">// CORS — locked to React dev server only (BP-08)</span>
+builder.Services.AddCors(o => o.AddPolicy(<span class="st">"ReactUI"</span>, p => p
+    .WithOrigins(<span class="st">"http://localhost:5173"</span>)
+    .AllowAnyHeader()
+    .AllowAnyMethod()));
+
+builder.Services.AddControllers();
+
+<span class="kw">var</span> app = builder.Build();
+
+<span class="cm">// Index all policy PDFs on startup — runs once before first request</span>
+<span class="kw">var</span> indexer   = app.Services.GetRequiredService&lt;<span class="cl">IPdfIndexingService</span>&gt;();
+<span class="kw">var</span> pdfFolder = app.Configuration[<span class="st">"Policies:FolderPath"</span>] ?? <span class="st">"Data/Policies"</span>;
+<span class="kw">await</span> indexer.IndexAllPoliciesAsync(pdfFolder);
+
+app.UseCors(<span class="st">"ReactUI"</span>);
+app.MapControllers();
+app.Run(<span class="st">"http://localhost:8000"</span>);
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- LAYER 5: UI -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="ui-structure">
+  <div class="ey">Layer 05 — React Frontend</div>
+  <h2>UI Folder Structure & Component Map</h2>
+
+  <div class="g2">
+    <div>
+      <div class="code">
+<span class="cm">// clarity-claim-ui/src/</span>
+src/
+├── <span class="cl">screens/</span>
+│   ├── EncounterCapture.jsx   <span class="cm">// Screen 1</span>
+│   ├── SOAPNoteEditor.jsx     <span class="cm">// Screen 2</span>
+│   └── ValidationScore.jsx   <span class="cm">// Screen 3</span>
+│
+├── <span class="cl">components/</span>
+│   ├── PatientSidebar.jsx     <span class="cm">// FHIR patient card</span>
+│   ├── AudioRecorder.jsx      <span class="cm">// Record + playback</span>
+│   ├── TranscriptStream.jsx   <span class="cm">// SSE live text</span>
+│   ├── SOAPPanel.jsx          <span class="cm">// Single S/O/A/P panel</span>
+│   ├── ICD10Chips.jsx         <span class="cm">// Code chips + confidence</span>
+│   ├── ApprovalGauge.jsx      <span class="cm">// Animated 0-100 dial</span>
+│   ├── GapChecklist.jsx       <span class="cm">// Gap rows + Fix This</span>
+│   ├── PatientSummary.jsx     <span class="cm">// Plain-text + lang toggle</span>
+│   └── RegulatoryPanel.jsx    <span class="cm">// PS 35 updates</span>
+│
+├── <span class="cl">hooks/</span>
+│   └── useClinicalRecord.js   <span class="cm">// Shared state</span>
+│
+├── <span class="cl">services/</span>
+│   └── api.js                 <span class="cm">// All fetch() calls</span>
+│
+├── App.jsx                    <span class="cm">// Screen router</span>
+└── main.jsx                   <span class="cm">// Entry point</span>
+      </div>
+    </div>
+    <div id="ui-state">
+      <h4>Shared State — useClinicalRecord Hook</h4>
+      <div class="code">
+<span class="cm">// hooks/useClinicalRecord.js</span>
+<span class="kw">import</span> { useState } <span class="kw">from</span> <span class="st">'react'</span>;
+
+<span class="kw">export function</span> <span class="fn">useClinicalRecord</span>() {
+  <span class="kw">const</span> [record, setRecord] = useState({
+    patient:        <span class="kw">null</span>,      <span class="cm">// FhirPatientContext</span>
+    transcript:     <span class="st">''</span>,
+    soapNote:       <span class="kw">null</span>,      <span class="cm">// SoapNote</span>
+    validation:     <span class="kw">null</span>,      <span class="cm">// ValidationResult</span>
+    patientSummary: <span class="st">''</span>,
+    fromFallback:   <span class="kw">false</span>
+  });
+
+  <span class="kw">const</span> <span class="fn">updateRecord</span> = (patch) =>
+    setRecord(prev => ({ ...prev, ...patch }));
+
+  <span class="kw">return</span> { record, updateRecord };
+}
+      </div>
+      <h4 style="margin-top:16px;">Screen Navigation</h4>
+      <div class="code">
+<span class="cm">// App.jsx — simple index-based routing</span>
+<span class="kw">const</span> SCREENS = [
+  EncounterCapture,   <span class="cm">// index 0</span>
+  SOAPNoteEditor,     <span class="cm">// index 1</span>
+  ValidationScore     <span class="cm">// index 2</span>
+];
+<span class="cm">// No React Router needed — just useState(screenIndex)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UI SCREENS -->
+<div class="sec" id="ui-screen1">
+  <div class="ey">Layer 05 — UI Screens</div>
+  <h2>Screen 1 — Encounter Capture</h2>
+  <div class="code">
+<span class="cm">// screens/EncounterCapture.jsx — key logic only</span>
+<span class="kw">export function</span> <span class="cl">EncounterCapture</span>({ record, updateRecord, onNext }) {
+  <span class="kw">const</span> [loading, setLoading] = useState(<span class="kw">false</span>);
+
+  <span class="kw">const</span> <span class="fn">handleGenerateClick</span> = <span class="kw">async</span> () => {
+    setLoading(<span class="kw">true</span>);
+    <span class="kw">try</span> {
+      <span class="kw">const</span> result = <span class="kw">await</span> api.<span class="fn">generateSoap</span>({
+        transcript:     record.transcript,
+        patientContext: record.patient
+      });
+      updateRecord({ soapNote: result.soapNote, fromFallback: result.fromFallback });
+      onNext();   <span class="cm">// advance to Screen 2</span>
+    } <span class="kw">finally</span> { setLoading(<span class="kw">false</span>); }
+  };
+
+  <span class="kw">return</span> (
+    &lt;div className=<span class="st">"flex h-screen"</span>&gt;
+      &lt;<span class="cl">PatientSidebar</span> patient={record.patient} /&gt;
+      &lt;div className=<span class="st">"flex-1 flex flex-col p-8"</span>&gt;
+        &lt;<span class="cl">AudioRecorder</span>
+          onTranscriptUpdate={text => updateRecord({ transcript: text })}
+        /&gt;
+        &lt;<span class="cl">TranscriptStream</span> text={record.transcript} /&gt;
+        &lt;button
+          onClick={handleGenerateClick}
+          disabled={!record.transcript || loading}
+          className=<span class="st">"mt-4 bg-blue-600 text-white px-6 py-2 rounded disabled:opacity-40"</span>
+        &gt;
+          {loading ? <span class="st">"Generating..."</span> : <span class="st">"Generate Clinical Note"</span>}
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+  </div>
+</div>
+
+<div class="sec" id="ui-screen2">
+  <h2>Screen 2 — SOAP Note Editor</h2>
+  <div class="code">
+<span class="cm">// screens/SOAPNoteEditor.jsx — key logic only</span>
+<span class="kw">export function</span> <span class="cl">SOAPNoteEditor</span>({ record, updateRecord, onNext }) {
+  <span class="kw">const</span> [note, setNote] = useState(record.soapNote);
+  <span class="kw">const</span> [loading, setLoading] = useState(<span class="kw">false</span>);
+
+  <span class="kw">const</span> <span class="fn">handleFieldChange</span> = (field, value) =>
+    setNote(prev => ({ ...prev, [field]: value }));
+
+  <span class="kw">const</span> <span class="fn">handleValidateClick</span> = <span class="kw">async</span> () => {
+    setLoading(<span class="kw">true</span>);
+    updateRecord({ soapNote: note });  <span class="cm">// persist edits</span>
+    <span class="kw">try</span> {
+      <span class="kw">const</span> result = <span class="kw">await</span> api.<span class="fn">validate</span>({
+        soapNote:   note,
+        icd10Codes: note.icd10Codes.map(c => c.code)
+      });
+      updateRecord({ validation: result.result, fromFallback: result.fromFallback });
+      onNext();  <span class="cm">// advance to Screen 3</span>
+    } <span class="kw">finally</span> { setLoading(<span class="kw">false</span>); }
+  };
+
+  <span class="kw">return</span> (
+    &lt;div className=<span class="st">"p-8 grid grid-cols-2 gap-6"</span>&gt;
+      {[<span class="st">'subjective'</span>,<span class="st">'objective'</span>,<span class="st">'assessment'</span>,<span class="st">'plan'</span>].map(field =&gt; (
+        &lt;<span class="cl">SOAPPanel</span> key={field} label={field.toUpperCase()}
+          value={note?.[field] ?? <span class="st">''</span>}
+          onChange={v => handleFieldChange(field, v)} /&gt;
+      ))}
+      &lt;<span class="cl">ICD10Chips</span> codes={note?.icd10Codes ?? []} /&gt;
+      &lt;button onClick={handleValidateClick} disabled={loading}
+        className=<span class="st">"col-span-2 bg-indigo-600 text-white px-6 py-2 rounded"</span>&gt;
+        {loading ? <span class="st">"Validating..."</span> : <span class="st">"Run Validation"</span>}
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}
+  </div>
+</div>
+
+<div class="sec" id="ui-screen3">
+  <h2>Screen 3 — Validation Scorecard</h2>
+  <div class="note teal">
+    <p><strong>This screen is the demo's critical path.</strong> The <code>ApprovalGauge</code> animation from 74% → 93% is the moment that wins the hackathon. Build and test this component before anything else in the UI layer.</p>
+  </div>
+  <div class="code">
+<span class="cm">// components/ApprovalGauge.jsx — animated SVG gauge</span>
+<span class="kw">export function</span> <span class="cl">ApprovalGauge</span>({ score }) {
+  <span class="kw">const</span> [displayed, setDisplayed] = useState(<span class="nm">0</span>);
+
+  useEffect(() => {
+    <span class="kw">const</span> start    = displayed;
+    <span class="kw">const</span> duration = <span class="nm">1200</span>;  <span class="cm">// ms — smooth animation</span>
+    <span class="kw">const</span> startTime = performance.now();
+
+    <span class="kw">const</span> tick = (now) => {
+      <span class="kw">const</span> progress = Math.min((now - startTime) / duration, <span class="nm">1</span>);
+      setDisplayed(Math.round(start + (score - start) * progress));
+      <span class="kw">if</span> (progress < <span class="nm">1</span>) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [score]);
+
+  <span class="kw">const</span> colour = displayed >= <span class="nm">80</span> ? <span class="st">'#4ade80'</span> : displayed >= <span class="nm">60</span> ? <span class="st">'#fbbf24'</span> : <span class="st">'#f87171'</span>;
+
+  <span class="kw">return</span> (
+    &lt;div className=<span class="st">"flex flex-col items-center"</span>&gt;
+      &lt;svg width=<span class="st">"200"</span> height=<span class="st">"120"</span> viewBox=<span class="st">"0 0 200 120"</span>&gt;
+        &lt;path d=<span class="st">"M 20 100 A 80 80 0 0 1 180 100"</span> fill=<span class="st">"none"</span>
+              stroke=<span class="st">"#2a2a32"</span> strokeWidth=<span class="st">"12"</span>/&gt;
+        &lt;path d=<span class="st">`M 20 100 A 80 80 0 0 1 180 100`</span> fill=<span class="st">"none"</span>
+              stroke={colour} strokeWidth=<span class="st">"12"</span>
+              strokeDasharray={<span class="st">`${(displayed/100)*251} 251`</span>}/&gt;
+      &lt;/svg&gt;
+      &lt;div className=<span class="st">"text-4xl font-bold"</span> style={{color: colour}}&gt;
+        {displayed}%
+      &lt;/div&gt;
+      &lt;div className=<span class="st">"text-sm text-gray-400 mt-1"</span>&gt;Approval Probability&lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+  </div>
+</div>
+
+<!-- API SERVICE LAYER -->
+<div class="sec" id="ui-api">
+  <div class="ey">Layer 05 — UI Service Layer</div>
+  <h2>API Service — All Backend Calls</h2>
+  <div class="code">
+<span class="cm">// services/api.js — single source of truth for all HTTP calls</span>
+<span class="kw">const</span> BASE = <span class="st">'http://localhost:8000/api'</span>;
+
+<span class="kw">export const</span> api = {
+
+  <span class="kw">async</span> <span class="fn">getPatient</span>(patientId) {
+    <span class="kw">const</span> r = <span class="kw">await</span> fetch(<span class="st">`${BASE}/patient/${patientId}`</span>);
+    <span class="kw">if</span> (!r.ok) <span class="kw">throw new</span> Error(<span class="st">'Patient fetch failed'</span>);
+    <span class="kw">return</span> r.json();
+  },
+
+  <span class="kw">async</span> <span class="fn">transcribe</span>(audioFile) {
+    <span class="kw">const</span> form = <span class="kw">new</span> FormData();
+    form.append(<span class="st">'audio'</span>, audioFile);
+    <span class="kw">const</span> r = <span class="kw">await</span> fetch(<span class="st">`${BASE}/transcribe`</span>, { method: <span class="st">'POST'</span>, body: form });
+    <span class="kw">if</span> (!r.ok) <span class="kw">throw new</span> Error(<span class="st">'Transcription failed'</span>);
+    <span class="kw">return</span> r.json();
+  },
+
+  <span class="kw">async</span> <span class="fn">generateSoap</span>(payload) {
+    <span class="kw">const</span> r = <span class="kw">await</span> fetch(<span class="st">`${BASE}/generate-soap`</span>, {
+      method:  <span class="st">'POST'</span>,
+      headers: { <span class="st">'Content-Type'</span>: <span class="st">'application/json'</span> },
+      body:    JSON.stringify(payload)
+    });
+    <span class="kw">if</span> (!r.ok) <span class="kw">throw new</span> Error(<span class="st">'SOAP generation failed'</span>);
+    <span class="kw">return</span> r.json();
+  },
+
+  <span class="kw">async</span> <span class="fn">validate</span>(payload) {
+    <span class="kw">const</span> r = <span class="kw">await</span> fetch(<span class="st">`${BASE}/validate`</span>, {
+      method:  <span class="st">'POST'</span>,
+      headers: { <span class="st">'Content-Type'</span>: <span class="st">'application/json'</span> },
+      body:    JSON.stringify(payload)
+    });
+    <span class="kw">if</span> (!r.ok) <span class="kw">throw new</span> Error(<span class="st">'Validation failed'</span>);
+    <span class="kw">return</span> r.json();
+  },
+
+  <span class="kw">async</span> <span class="fn">getPatientSummary</span>(payload) {
+    <span class="kw">const</span> r = <span class="kw">await</span> fetch(<span class="st">`${BASE}/patient-summary`</span>, {
+      method:  <span class="st">'POST'</span>,
+      headers: { <span class="st">'Content-Type'</span>: <span class="st">'application/json'</span> },
+      body:    JSON.stringify(payload)
+    });
+    <span class="kw">if</span> (!r.ok) <span class="kw">throw new</span> Error(<span class="st">'Summary failed'</span>);
+    <span class="kw">return</span> r.json();
+  },
+
+  <span class="kw">async</span> <span class="fn">getRegulatoryUpdates</span>() {
+    <span class="kw">const</span> r = <span class="kw">await</span> fetch(<span class="st">`${BASE}/regulatory`</span>);
+    <span class="kw">if</span> (!r.ok) <span class="kw">throw new</span> Error(<span class="st">'Regulatory fetch failed'</span>);
+    <span class="kw">return</span> r.json();
+  }
+};
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- POLICY FILES REFERENCE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="sec" id="policies">
+  <div class="ey">Reference</div>
+  <h2>NCD/LCD Policy Files — Confirmed</h2>
+  <p class="lead">These are the 6 PDF files confirmed downloaded and available in the project. The RAG pipeline indexes all 6 at startup. Together they cover the three clinical scenarios used in the demo.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Filename</th><th>LCD/Article ID</th><th>Content Type</th><th>Demo Use</th></tr></thead>
+    <tbody>
+      <tr><td><code>L34220_lumbar_mri_lcd.pdf</code></td><td>LCD L34220</td><td>Clinical criteria, medical necessity, red flags, 4-week conservative treatment rule, documentation requirements</td><td><strong>Primary demo scenario</strong> — patient needs lumbar MRI. Gap: conservative treatment duration missing. Fix: add 4+ weeks PT documentation.</td></tr>
+      <tr><td><code>L36839_sleep_studies_lcd.pdf</code></td><td>LCD L36839</td><td>Coverage for polysomnography, home sleep tests, OSA diagnostic criteria, accreditation requirements</td><td>PS 35 regulatory panel — shows as "documentation requirements tightened" update</td></tr>
+      <tr><td><code>L39266_cognitive_assessment_lcd.pdf</code></td><td>LCD L39266</td><td>Coverage for CPT 99483, required assessment tools (Mini-Cog, FAST, CDR), independent historian requirement</td><td>PS 35 regulatory panel — shows as "coverage criteria expanded" update</td></tr>
+      <tr><td><code>A56903_sleep_studies_codes.pdf</code></td><td>Article A56903</td><td>CPT/HCPCS codes for polysomnography (95808, 95810, 95811), home sleep test codes, ICD-10 codes supported</td><td>RAG context when sleep-related ICD codes are submitted for validation</td></tr>
+      <tr><td><code>A59036_cognitive_assessment_codes.pdf</code></td><td>Article A59036</td><td>CPT 99483 billing rules, required documentation elements, Mini-Cog and dementia staging tool requirements</td><td>RAG context when cognitive assessment codes are submitted</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note amber">
+    <p><strong>Missing file note:</strong> The Lumbar MRI Billing & Coding Article (A57206) was identified but is not confirmed downloaded yet. Add it to <code>/Data/Policies/</code> as <code>A57206_lumbar_mri_codes.pdf</code> from <code>https://www.cms.gov/medicare-coverage-database/view/article.aspx?articleId=57206</code> — it contains the ICD-10 and CPT code list that strengthens the demo gap analysis for the lumbar MRI scenario.</p>
+  </div>
+</div>
+
+<!-- ERROR HANDLING -->
+<div class="sec" id="errors">
+  <div class="ey">Reference</div>
+  <h2>Error Handling Strategy</h2>
+
+  <div class="g2">
+    <div class="card blue-t">
+      <div class="tag t-blue">LLM Inference Errors</div>
+      <p style="font-size:12.5px;"><strong>Pattern:</strong> Always wrap in try/catch in the Service layer. Never throw to the Controller. Return <code>FromFallback: true</code> and serve the pre-generated JSON from <code>/Data/Fallbacks/</code>. Log the error with <code>ILogger.LogWarning</code> — not Error, because this is expected during demos.</p>
+    </div>
+    <div class="card teal-t">
+      <div class="tag t-teal">JSON Parse Errors</div>
+      <p style="font-size:12.5px;"><strong>Pattern:</strong> Strip markdown fences before deserialising. If <code>JsonSerializer.Deserialize</code> throws, log raw response at Debug level and return fallback. Never expose the raw LLM string in an API error response — it may contain PHI from the transcript.</p>
+    </div>
+    <div class="card green-t">
+      <div class="tag t-green">FHIR Unavailable</div>
+      <p style="font-size:12.5px;"><strong>Pattern:</strong> Cache-first always. If cache file exists, serve it. If cache is missing and live call fails, return an empty <code>FhirPatientContext</code> with the PatientId populated. Never block the SOAP generation — it can run without FHIR context.</p>
+    </div>
+    <div class="card amber-t">
+      <div class="tag t-amber">Frontend Error Boundary</div>
+      <p style="font-size:12.5px;"><strong>Pattern:</strong> Wrap each screen in a React Error Boundary. If a screen crashes, show the pre-rendered screenshot fallback. Never let the entire app white-screen during a judge presentation. The fallback screenshots must be loaded as static assets in <code>/public/fallbacks/</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="background:var(--s1); border-top:1px solid var(--border); padding:24px 60px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div>
+      <div style="font-family:var(--serif); color:var(--ink); font-size:15px; font-weight:700;">ClarityClaim — Low Level Design v1.0</div>
+      <div style="font-family:var(--mono); color:var(--light); font-size:10px; margin-top:3px;">5 Layers · Domain → Infrastructure → Services → API → UI · PS 37 + PS 39 · 6 NCD/LCD Policy Files</div>
+    </div>
+    <div class="chip-row">
+      <div class="chip hi">v1.0 — Ready to Build</div>
+      <div class="chip">ASP.NET Core 10</div>
+      <div class="chip">React + Vite</div>
+      <div class="chip teal">Qwen3.6-35B × 2</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</body>
+</html>

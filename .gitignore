@@ -1,0 +1,18 @@
+# .NET
+bin/
+obj/
+*.user
+ClarityClaim.API/appsettings.Development.json
+
+# Node / Vite
+node_modules/
+clarity-claim-ui/dist/
+
+# Large model weights / caches -- not checked in, downloaded per Install Guide
+ClarityClaim.API/Data/Models/*.bin
+ClarityClaim.API/Data/Models/tessdata/
+
+# IDE
+.vs/
+.vscode/
+*.suo

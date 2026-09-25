@@ -1,0 +1,9 @@
+{
+  "patientId": "demo-001",
+  "fullName": "Margaret Chen",
+  "dateOfBirth": "1966-04-12",
+  "gender": "female",
+  "conditions": ["Type 2 diabetes mellitus", "Hypertension", "Chronic low back pain"],
+  "medications": ["Metformin 500mg twice daily", "Lisinopril 10mg daily"],
+  "allergies": ["Penicillin"]
+}

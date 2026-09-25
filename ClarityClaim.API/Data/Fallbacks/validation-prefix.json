@@ -1,0 +1,24 @@
+{
+  "approvalProbability": 74,
+  "gaps": [
+    {
+      "policyRef": "LCD L34220",
+      "requirement": "Minimum 4 weeks of documented conservative treatment (physical therapy, NSAIDs, or activity modification) prior to advanced imaging",
+      "currentDoc": "No conservative treatment duration documented in the current note",
+      "severity": "Critical"
+    }
+  ],
+  "fixes": [
+    {
+      "gapIndex": 0,
+      "suggestedLanguage": "Patient completed 4 weeks of physical therapy and NSAID therapy without symptomatic improvement, per LCD L34220 conservative management requirement."
+    }
+  ],
+  "policyReferences": ["LCD L34220 — Lumbar MRI p.3"],
+  "passingCriteria": [
+    "Radicular symptoms documented",
+    "Positive straight leg raise documented",
+    "Dermatomal sensory findings documented"
+  ],
+  "humanReviewFlags": []
+}

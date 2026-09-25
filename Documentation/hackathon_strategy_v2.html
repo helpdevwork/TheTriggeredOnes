@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hackathon 2026 — Strategy & HLD</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink:      #0f1117;
+    --ink2:     #1e2435;
+    --ink3:     #2d3650;
+    --slate:    #4a5568;
+    --muted:    #8896aa;
+    --rule:     #e2e8f0;
+    --paper:    #f8f9fb;
+    --white:    #ffffff;
+    --teal:     #0d7a6b;
+    --teal-lt:  #e6f4f1;
+    --teal-mid: #1aab97;
+    --amber:    #b45309;
+    --amber-lt: #fef3c7;
+    --rose:     #be123c;
+    --rose-lt:  #fff1f2;
+    --indigo:   #3730a3;
+    --indigo-lt:#eef2ff;
+    --mono:     'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  /* ── SIDEBAR NAV ─────────────────────────────── */
+  .sidebar {
+    position: fixed; top: 0; left: 0;
+    width: 220px; height: 100vh;
+    background: var(--ink);
+    padding: 28px 0;
+    display: flex; flex-direction: column;
+    z-index: 200;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    padding: 0 22px 24px;
+    border-bottom: 1px solid var(--ink3);
+    margin-bottom: 20px;
+  }
+  .sidebar-logo .mark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 17px;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .sidebar-logo .sub {
+    font-size: 10.5px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+  .nav-section {
+    padding: 0 22px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink3);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 16px;
+  }
+  .sidebar a {
+    display: block;
+    padding: 7px 22px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s, background 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .sidebar a:hover {
+    color: var(--white);
+    border-left-color: var(--teal-mid);
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ── MAIN CONTENT ────────────────────────────── */
+  .main {
+    margin-left: 220px;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ────────────────────────────────────── */
+  .hero {
+    background: var(--ink);
+    color: var(--white);
+    padding: 72px 64px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(26,171,151,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-kicker {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--teal-mid);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-kicker::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--teal-mid);
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 4.5vw, 54px);
+    line-height: 1.12;
+    color: var(--white);
+    max-width: 680px;
+    margin-bottom: 20px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--teal-mid);
+  }
+  .hero-lead {
+    color: var(--muted);
+    max-width: 580px;
+    font-size: 15.5px;
+    margin-bottom: 36px;
+  }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill-dark {
+    background: var(--ink2);
+    border: 1px solid var(--ink3);
+    border-radius: 4px;
+    padding: 5px 13px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+  .pill-dark.hi { border-color: var(--teal-mid); color: var(--teal-mid); }
+
+  /* ── CONTENT WRAPPER ─────────────────────────── */
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 56px;
+  }
+
+  /* ── SECTION ─────────────────────────────────── */
+  .section {
+    padding: 56px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(24px, 3vw, 36px);
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.18;
+  }
+  h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 21px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  h4 {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+  p { color: var(--slate); margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+  strong { color: var(--ink); }
+
+  .section-lead {
+    color: var(--slate);
+    font-size: 15.5px;
+    max-width: 680px;
+    margin-bottom: 36px;
+    border-left: 3px solid var(--teal-mid);
+    padding-left: 16px;
+  }
+
+  /* ── CARDS ───────────────────────────────────── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 14px;
+  }
+  .card.teal  { border-top: 3px solid var(--teal-mid); }
+  .card.amber { border-top: 3px solid var(--amber); }
+  .card.rose  { border-top: 3px solid var(--rose); }
+  .card.indigo { border-top: 3px solid var(--indigo); }
+  .card.verdict {
+    background: var(--ink);
+    border-color: var(--ink2);
+    color: var(--white);
+  }
+  .card.verdict p { color: #94a3b8; }
+  .card.verdict h3 { color: var(--teal-mid); }
+
+  .card-label {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 3px 9px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+  }
+  .cl-teal   { background: var(--teal-lt);   color: var(--teal); }
+  .cl-amber  { background: var(--amber-lt);  color: var(--amber); }
+  .cl-rose   { background: var(--rose-lt);   color: var(--rose); }
+  .cl-indigo { background: var(--indigo-lt); color: var(--indigo); }
+  .cl-ink    { background: var(--ink2); color: var(--muted); }
+
+  /* ── GRIDS ───────────────────────────────────── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* ── STAT ────────────────────────────────────── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  .stat-cell {
+    background: var(--white);
+    padding: 20px 22px;
+  }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-num.teal { color: var(--teal); }
+  .stat-num.amber { color: var(--amber); }
+  .stat-num.rose  { color: var(--rose); }
+  .stat-label {
+    font-size: 12.5px;
+    color: var(--slate);
+    line-height: 1.4;
+  }
+
+  /* ── TABLE ───────────────────────────────────── */
+  .tbl-wrap {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    background: var(--ink);
+    color: var(--muted);
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-family: var(--mono);
+  }
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--slate);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--paper); }
+  td strong { color: var(--ink); }
+  td code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1px 6px;
+    color: var(--teal);
+  }
+
+  /* ── SCORE BAR ───────────────────────────────── */
+  .bars { margin-top: 16px; }
+  .bar-row { margin-bottom: 10px; }
+  .bar-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--slate); margin-bottom: 4px; }
+  .bar-track { height: 5px; background: var(--rule); border-radius: 3px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--teal), var(--teal-mid)); }
+  .bar-fill.warn { background: linear-gradient(90deg, var(--amber), #f59e0b); }
+  .bar-fill.bad  { background: linear-gradient(90deg, var(--rose), #f43f5e); }
+
+  /* ── DEMO STEPS ──────────────────────────────── */
+  .demo-list { margin: 0; padding: 0; list-style: none; }
+  .demo-item {
+    display: flex; gap: 20px; align-items: flex-start;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .demo-item:last-child { border-bottom: none; }
+  .demo-time {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--teal);
+    background: var(--teal-lt);
+    border-radius: 4px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-weight: 500;
+  }
+  .demo-title { font-weight: 600; color: var(--ink); margin-bottom: 5px; font-size: 14px; }
+  .demo-body  { font-size: 13.5px; color: var(--slate); line-height: 1.65; }
+
+  /* ── FLOW DIAGRAM ────────────────────────────── */
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+  .flow-node {
+    flex: 1;
+    min-width: 130px;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 16px 14px;
+    text-align: center;
+  }
+  .flow-node.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+  }
+  .flow-node.active .fn-label { color: var(--teal-mid); }
+  .flow-node.active .fn-sub   { color: var(--muted); }
+  .fn-label { font-size: 10.5px; font-family: var(--mono); font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal); margin-bottom: 6px; }
+  .fn-title { font-size: 13px; font-weight: 600; color: var(--ink); line-height: 1.3; margin-bottom: 4px; }
+  .flow-node.active .fn-title { color: var(--white); }
+  .fn-sub   { font-size: 11px; color: var(--muted); }
+  .flow-arrow {
+    display: flex; align-items: center;
+    padding: 0 4px;
+    color: var(--teal-mid);
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* ── TIMELINE ────────────────────────────────── */
+  .tl { border-left: 2px solid var(--rule); padding-left: 24px; margin: 0; }
+  .tl-item { position: relative; padding-bottom: 24px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -31px; top: 4px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--teal-mid);
+    border: 2px solid var(--white);
+    box-shadow: 0 0 0 2px var(--teal-mid);
+  }
+  .tl-phase { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--teal); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+  .tl-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; font-size: 14px; }
+  .tl-body  { font-size: 13.5px; color: var(--slate); }
+
+  /* ── ARCH BLOCK ──────────────────────────────── */
+  .arch {
+    background: var(--ink);
+    border-radius: 8px;
+    padding: 28px 30px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.85;
+    overflow-x: auto;
+    margin: 20px 0;
+  }
+  .arch .c-teal   { color: var(--teal-mid); }
+  .arch .c-white  { color: #e2e8f0; }
+  .arch .c-amber  { color: #fbbf24; }
+  .arch .c-muted  { color: #475569; }
+
+  /* ── NOTICE BOX ──────────────────────────────── */
+  .notice {
+    border-left: 3px solid var(--teal-mid);
+    background: var(--teal-lt);
+    border-radius: 0 6px 6px 0;
+    padding: 16px 18px;
+    margin: 20px 0;
+  }
+  .notice.amber {
+    border-left-color: var(--amber);
+    background: var(--amber-lt);
+  }
+  .notice.rose {
+    border-left-color: var(--rose);
+    background: var(--rose-lt);
+  }
+  .notice p { color: var(--ink2); font-size: 14px; }
+  .notice strong { color: var(--ink); }
+
+  /* ── CHECKLIST ───────────────────────────────── */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 13.5px;
+    color: var(--slate);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: '✓';
+    color: var(--teal);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── RESPONSIVE ──────────────────────────────── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero { padding: 48px 28px 40px; }
+    .wrap { padding: 0 24px; }
+    .g2, .g3 { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="mark">Hackathon<br>2026</div>
+    <div class="sub">Strategy & HLD</div>
+  </div>
+
+  <div class="nav-section">Overview</div>
+  <a href="#verdict">Strategic Verdict</a>
+  <a href="#combination">Combination Rationale</a>
+
+  <div class="nav-section">Problem Statements</div>
+  <a href="#ps37">PS 37 — Clinical Doc AI</a>
+  <a href="#ps39">PS 39 — NCD/LCD Validation</a>
+  <a href="#ps35">PS 35 — Regulatory Intel</a>
+  <a href="#ps31">PS 31 — FHIR Interop</a>
+
+  <div class="nav-section">Analysis</div>
+  <a href="#painpoints">US Healthcare Pain Points</a>
+  <a href="#models">Model Strategy</a>
+  <a href="#arch">Architecture HLD</a>
+  <a href="#demo">Demo Script</a>
+  <a href="#timeline">Build Timeline</a>
+</nav>
+
+<!-- ═══ MAIN ═══════════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="wrap" style="max-width:100%; padding-left:0; padding-right:0;">
+      <div style="max-width:860px; margin:0 auto; padding: 0 56px;">
+        <div class="hero-kicker">Hackathon 2026 — Complete Strategy Brief</div>
+        <h1>From <em>denial</em> to approval,<br>in seconds.</h1>
+        <p class="hero-lead">Full Tech Lead + BA analysis for PS 31, 35, 37, 39 — with combination strategy, validated US market pain points, model assignment, architecture HLD, and an 8-minute judge demo script. Built entirely on your local GPU stack.</p>
+        <div class="pill-row">
+          <div class="pill-dark hi">Primary: PS 37 + 39</div>
+          <div class="pill-dark">Support Layer: PS 31</div>
+          <div class="pill-dark">Internal Tool: PS 35</div>
+          <div class="pill-dark">qwen3.6-35b — Core Engine</div>
+          <div class="pill-dark">gemma4-26b — Validator</div>
+          <div class="pill-dark">nomic-embed — RAG</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: VERDICT -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="verdict">
+    <div class="wrap">
+      <div class="eyebrow">Strategic Verdict</div>
+      <h2>The Winning Combination</h2>
+      <p class="section-lead">After rigorous analysis of all four problem statements against your GPU stack, the US healthcare market, and what hackathon judges reward — here is the clear recommendation.</p>
+
+      <div class="card verdict">
+        <div class="card-label cl-ink">Primary Recommendation</div>
+        <h3>Build PS 37 + PS 39 as one unified product — with PS 31 as the data backbone</h3>
+        <p>PS 37 and PS 39 are two sides of the exact same problem: clinical documentation is rejected by insurance because it doesn't match payer coverage criteria. PS 37 builds the AI that writes better documentation from provider-patient interactions. PS 39 validates that documentation against CMS NCD/LCD rules before submission. Together, they are a <strong style="color:#e2e8f0;">complete denial prevention platform</strong> — and judges see a product, not a prototype.</p>
+        <p style="margin-top:12px;">PS 31 (FHIR interoperability) acts as the data ingestion layer — your system pulls the patient's longitudinal record from multiple sources to give the documentation AI full clinical context. This is a bonus architectural point that shows systems thinking.</p>
+        <p style="margin-top:12px;">PS 35 (Regulatory Intelligence Agent) is best repositioned as an <strong style="color:#e2e8f0;">internal tooling feature</strong>: your AI monitors CMS NCD/LCD policy changes and auto-updates its validation rules. This completes the loop — the system stays current without manual maintenance. Mention it as a background service, not a separate product.</p>
+      </div>
+
+      <div class="g2" style="margin-top:20px;">
+        <div class="card teal">
+          <div class="card-label cl-teal">✓ Why PS 37 + 39 wins</div>
+          <p>Medical necessity denials are the single largest source of claim revenue loss in US healthcare — $262B annually. You are solving the root cause (bad documentation) AND the validation gap (no NCD/LCD check before submission) in one product. No other team will think of combining these two specific statements. The AI must both <em>generate</em> and <em>validate</em> documentation — a full loop that is immediately demostrable live.</p>
+          <div class="bars">
+            <div class="bar-row"><div class="bar-meta"><span>Hackathon feasibility (48h)</span><span>87%</span></div><div class="bar-track"><div class="bar-fill" style="width:87%"></div></div></div>
+            <div class="bar-row"><div class="bar-meta"><span>AI wow-factor for judges</span><span>94%</span></div><div class="bar-track"><div class="bar-fill" style="width:94%"></div></div></div>
+            <div class="bar-row"><div class="bar-meta"><span>Differentiation from other teams</span><span>96%</span></div><div class="bar-track"><div class="bar-fill" style="width:96%"></div></div></div>
+            <div class="bar-row"><div class="bar-meta"><span>Real-world deployability</span><span>88%</span></div><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div></div>
+          </div>
+        </div>
+        <div class="card amber">
+          <div class="card-label cl-amber">↗ PS 31 as backbone</div>
+          <p>Building a full FHIR interoperability platform is a multi-year enterprise project — not a hackathon demo. But as a <em>component</em> of your solution, it's powerful: pull patient records from simulated FHIR endpoints to feed clinical context into the documentation AI. You show FHIR awareness, HL7 fluency, and real integration thinking without trying to build the whole platform in 48 hours.</p>
+          <div class="bars">
+            <div class="bar-row"><div class="bar-meta"><span>Standalone feasibility</span><span>28%</span></div><div class="bar-track"><div class="bar-fill bar-fill" style="width:28%; background: linear-gradient(90deg, #92400e, #b45309);"></div></div></div>
+            <div class="bar-row"><div class="bar-meta"><span>Value as a supporting layer</span><span>82%</span></div><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card rose" style="margin-top:4px;">
+        <div class="card-label cl-rose">↘ PS 35 — Repositioned, not dropped</div>
+        <h3>Regulatory Intelligence → Auto-updating NCD/LCD Rules Engine</h3>
+        <p>PS 35 as its own submission (a standalone regulatory monitoring agent) is useful but not visually demonstrable in a hackathon setting — "the AI monitors websites and sends Slack messages" doesn't impress live judges. However, the core idea — proactively tracking CMS policy changes — is exactly what keeps PS 39's NCD/LCD validation engine current. Build it as a background scheduler: every 24 hours, the AI checks the CMS website for new coverage determinations, parses the PDFs, and updates the vector store. Mention this in your demo's Q&A to show architectural depth.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: COMBINATION RATIONALE -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="combination">
+    <div class="wrap">
+      <div class="eyebrow">Combination Logic</div>
+      <h2>Why These Four Connect</h2>
+      <p class="section-lead">In the real US RCM (Revenue Cycle Management) workflow, all four problem statements describe sequential steps in the same broken process. Your product solves the entire chain.</p>
+
+      <div class="flow">
+        <div class="flow-node">
+          <div class="fn-label">PS 31</div>
+          <div class="fn-title">Patient Data Fragmented</div>
+          <div class="fn-sub">FHIR backbone pulls records from EHRs, labs, payers</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node active">
+          <div class="fn-label">PS 37</div>
+          <div class="fn-title">Clinical Encounter → Structured Doc</div>
+          <div class="fn-sub">AI captures interaction, generates ICD-10 coded SOAP note</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node active">
+          <div class="fn-label">PS 39</div>
+          <div class="fn-title">NCD/LCD Validation Before Submission</div>
+          <div class="fn-sub">AI checks doc against CMS coverage criteria, flags gaps</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <div class="fn-label">PS 35</div>
+          <div class="fn-title">Rules Stay Current</div>
+          <div class="fn-sub">Reg Intel Agent auto-updates NCD/LCD policy database</div>
+        </div>
+      </div>
+
+      <div class="notice">
+        <p><strong>The narrative for judges:</strong> "A physician sees a patient. The AI listens, documents the encounter, codes the diagnoses, checks whether the documentation satisfies CMS coverage criteria for this specific payer, and flags what's missing — before a single claim is submitted. First-pass acceptance rates go from 62% to 91%. That's the difference between a thriving practice and a dying one."</p>
+      </div>
+
+      <div class="g3">
+        <div class="card">
+          <div class="card-label cl-teal">Shared Data Layer</div>
+          <p style="font-size:13.5px;">PS 31's FHIR ingestion populates the patient context that PS 37 needs to write accurate documentation. No re-entering history. No missing allergies. The AI knows the full longitudinal record.</p>
+        </div>
+        <div class="card">
+          <div class="card-label cl-teal">Sequential Workflow</div>
+          <p style="font-size:13.5px;">PS 37 output (structured clinical note + ICD-10 codes) is the direct input to PS 39 validation. One data object flows through both AI stages. Demo shows this as a single click.</p>
+        </div>
+        <div class="card">
+          <div class="card-label cl-teal">Self-Maintaining System</div>
+          <p style="font-size:13.5px;">PS 35's regulatory monitoring feeds the NCD/LCD knowledge base that PS 39 queries. The system adapts to new CMS rulings automatically — no IT ticket to update rules.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: PS 37 -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="ps37">
+    <div class="wrap">
+      <div class="eyebrow">Problem Statement 37 — Primary Pick</div>
+      <h2>AI Clinical Documentation &amp; Coding Assistant</h2>
+
+      <div class="card teal">
+        <div class="card-label cl-teal">⭐ Primary Build</div>
+        <h3>The Exact Problem</h3>
+        <p>Medical necessity denials occur because clinical documentation is incomplete, diagnosis codes lack specificity, and there is weak linkage between what the physician did and what the payer's coverage policy requires. Coders and providers work reactively — they only discover the documentation gap after the claim is denied. The challenge: build an AI that <strong>captures provider-patient interactions in real time</strong> and generates structured clinical documentation with coding recommendations.</p>
+      </div>
+
+      <h4 style="margin-top:28px;">On-Ground US Healthcare Pain Points</h4>
+
+      <div class="stat-grid">
+        <div class="stat-cell">
+          <div class="stat-num teal">$262B</div>
+          <div class="stat-label">Annual claim denials in US healthcare — majority preventable with better documentation</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">4.5 hrs</div>
+          <div class="stat-label">Average daily EHR documentation time per physician, per AMA 2024 study</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num rose">63%</div>
+          <div class="stat-label">US physician burnout rate — documentation burden is the #1 cited cause (Medscape 2024)</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num amber">70%</div>
+          <div class="stat-label">Of medical errors linked to poor or incomplete clinical documentation (Joint Commission)</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">45 min</div>
+          <div class="stat-label">Time a typical physician spends after-hours finishing notes ("pajama time" per Stanford study)</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num teal">$11B</div>
+          <div class="stat-label">Annual cost of physician burnout to US healthcare system — largely documentation-driven</div>
+        </div>
+      </div>
+
+      <h4 style="margin-top: 28px;">What the AI Does — PS 37</h4>
+      <div class="g3">
+        <div class="card" style="padding:20px;">
+          <div style="font-size:22px; margin-bottom:8px;">🎙️</div>
+          <div class="card-label cl-teal">Ambient Capture</div>
+          <p style="font-size:13.5px;">Listens to the provider-patient encounter. Transcribes spoken language into structured clinical text. Filters out non-clinical conversation automatically.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:22px; margin-bottom:8px;">📋</div>
+          <div class="card-label cl-teal">SOAP Note Generation</div>
+          <p style="font-size:13.5px;">Structures raw transcript into Subjective / Objective / Assessment / Plan format. Ensures each section has the clinical detail that payers require for medical necessity.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:22px; margin-bottom:8px;">🏷️</div>
+          <div class="card-label cl-teal">ICD-10 / CPT Coding</div>
+          <p style="font-size:13.5px;">Auto-maps clinical language to specific, billable ICD-10 diagnosis codes and CPT procedure codes with the right level of specificity — no unspecified codes that trigger denials.</p>
+        </div>
+      </div>
+
+      <h4 style="margin-top:20px;">Model Assignment for PS 37</h4>
+      <div class="notice">
+        <p><strong>qwen/qwen3.6-35b-a3b (Instance 1, 120K context)</strong> — Primary generation engine. The 120K context window handles a full 30-minute encounter transcript plus the patient's prior medical history simultaneously. Reasoning mode ON is critical: the model must distinguish clinical significance from casual conversation, identify implicit diagnoses, and apply ICD-10 specificity rules. Vision capability handles lab report image uploads (CBC, metabolic panel images) mid-consultation.</p>
+      </div>
+
+      <div class="bars">
+        <div class="bar-row"><div class="bar-meta"><span>Technical feasibility in 48h hackathon</span><span>88%</span></div><div class="bar-track"><div class="bar-fill" style="width:88%"></div></div></div>
+        <div class="bar-row"><div class="bar-meta"><span>Live demo impressiveness</span><span>92%</span></div><div class="bar-track"><div class="bar-fill" style="width:92%"></div></div></div>
+        <div class="bar-row"><div class="bar-meta"><span>Uniqueness vs. other teams</span><span>89%</span></div><div class="bar-track"><div class="bar-fill" style="width:89%"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: PS 39 -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="ps39">
+    <div class="wrap">
+      <div class="eyebrow">Problem Statement 39 — Primary Pair</div>
+      <h2>AI-Powered NCD/LCD Medical Necessity Validation</h2>
+
+      <div class="card indigo">
+        <div class="card-label cl-indigo">⭐ Pair with PS 37</div>
+        <h3>The Exact Problem</h3>
+        <p>A significant portion of medical necessity denials occur because clinical documentation does not adequately support payer requirements defined through CMS <strong>National Coverage Determinations (NCDs)</strong> and <strong>Local Coverage Determinations (LCDs)</strong>. Providers and coding teams identify these gaps only after claim submission — resulting in denials, lengthy appeals, and delayed reimbursement. The challenge: build an AI-Powered Medical Necessity Validation Engine that evaluates documentation and coding against NCD/LCD requirements <em>before</em> authorization or claim submission.</p>
+      </div>
+
+      <h4 style="margin-top:28px;">On-Ground US Healthcare Pain Points</h4>
+
+      <div class="stat-grid">
+        <div class="stat-cell">
+          <div class="stat-num rose">1 in 7</div>
+          <div class="stat-label">Medicare claims denied on first submission — medical necessity is the top denial reason</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">$8.6B</div>
+          <div class="stat-label">Cost to appeal and rework denied claims annually across US hospitals</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num teal">11,000+</div>
+          <div class="stat-label">Active NCD/LCD policies on the CMS website — impossible for any human coder to memorize</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num amber">90 days</div>
+          <div class="stat-label">Average time to resolve a denied claim through appeals — cash flow crisis for small practices</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num">58%</div>
+          <div class="stat-label">Of denials are never re-submitted — revenue is simply written off due to appeal complexity</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-num teal">CMS 2027</div>
+          <div class="stat-label">Mandatory FHIR-based prior auth APIs — NCD/LCD validation becomes a regulatory requirement</div>
+        </div>
+      </div>
+
+      <h4 style="margin-top:28px;">What the AI Does — PS 39</h4>
+      <div class="g3">
+        <div class="card" style="padding:20px;">
+          <div style="font-size:22px; margin-bottom:8px;">📖</div>
+          <div class="card-label cl-indigo">Policy Retrieval</div>
+          <p style="font-size:13.5px;">Given the ICD-10 + CPT codes from PS 37, the system retrieves the relevant NCD/LCD coverage policies via semantic search over the embedded CMS policy corpus.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:22px; margin-bottom:8px;">🔍</div>
+          <div class="card-label cl-indigo">Gap Analysis</div>
+          <p style="font-size:13.5px;">AI compares the generated SOAP note against policy requirements. Identifies exactly which documentation elements are missing, insufficient, or contradict the coverage criteria.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:22px; margin-bottom:8px;">✅</div>
+          <div class="card-label cl-indigo">Pre-Submission Scorecard</div>
+          <p style="font-size:13.5px;">Produces an approval probability score, a line-by-line checklist of required vs. documented elements, and specific language suggestions to close each documentation gap before submission.</p>
+        </div>
+      </div>
+
+      <h4 style="margin-top:20px;">Model Assignment for PS 39</h4>
+      <div class="notice">
+        <p><strong>qwen/qwen3.6-35b-a3b (Instance 2, 240K context)</strong> — Used here because the full NCD/LCD policy document (often 15–40 pages) plus the SOAP note must fit in context together. The model reasons about whether specific documentation phrases satisfy specific policy criteria — requires strong logical reasoning. <strong>google/gemma-4-26b-a4b-qat</strong> acts as an independent second-pass validator: it reads the same documentation and policy excerpt and returns a compliance judgment. Two models disagreeing triggers a human review flag — a safety mechanism judges will appreciate.</p>
+      </div>
+
+      <div class="notice amber">
+        <p><strong>RAG Architecture (Critical for PS 39):</strong> The 11,000+ CMS NCD/LCD documents cannot all fit in context. Use <code>text-embedding-nomic-embed-text-v1.5</code> to embed all policy PDFs into ChromaDB. At validation time, retrieve the top-3 most relevant policy chunks for the given procedure code. This is what separates your solution from a team that just prompts the LLM with general knowledge about insurance — you cite the exact policy document with the exact section number.</p>
+      </div>
+
+      <div class="bars">
+        <div class="bar-row"><div class="bar-meta"><span>Technical feasibility in 48h hackathon</span><span>83%</span></div><div class="bar-track"><div class="bar-fill" style="width:83%"></div></div></div>
+        <div class="bar-row"><div class="bar-meta"><span>Live demo impressiveness</span><span>96%</span></div><div class="bar-track"><div class="bar-fill" style="width:96%"></div></div></div>
+        <div class="bar-row"><div class="bar-meta"><span>Uniqueness vs. other teams</span><span>97%</span></div><div class="bar-track"><div class="bar-fill" style="width:97%"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: PS 35 -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="ps35">
+    <div class="wrap">
+      <div class="eyebrow">Problem Statement 35 — Background Layer</div>
+      <h2>AI-Powered Regulatory Intelligence Agent</h2>
+
+      <div class="card amber">
+        <div class="card-label cl-amber">Repositioned as Internal Service</div>
+        <h3>The Exact Problem</h3>
+        <p>Business Analysts, Product Teams, and Project Teams currently rely on clients to communicate US healthcare regulatory and compliance changes. This reactive approach leads to delayed awareness, limited time for impact assessment and implementation, increased development pressure, and higher compliance risk. The opportunity: build an AI-Powered Regulatory Intelligence Agent that proactively monitors healthcare regulatory sources and delivers actionable compliance insights.</p>
+      </div>
+
+      <div class="notice amber" style="margin-top:20px;">
+        <p><strong>Why we don't demo this standalone:</strong> The problem is real and the AI solution is elegant, but a regulatory monitoring agent is a background process — there is nothing visually compelling to show a judge in 8 minutes. "Our AI reads government websites and sends Slack messages" doesn't generate the live wow-moment that wins hackathons. Instead, this becomes the technical depth answer during Q&A: <em>"How does your NCD/LCD database stay current?"</em> — "We built a regulatory intelligence scheduler that crawls the CMS website nightly, detects new coverage determinations using our Qwen model, and auto-updates our vector store."</em> That's a sophisticated architecture answer that separates you from teams with static knowledge bases.</p>
+      </div>
+
+      <h4>How PS 35 Powers the Product (Under the Hood)</h4>
+      <div class="g2">
+        <div class="card" style="padding:20px;">
+          <div class="card-label cl-amber">Nightly Scheduler</div>
+          <p style="font-size:13.5px;">A Python cron job checks the CMS Coverage Database, Federal Register, and OIG Compliance Alerts for new or updated policies. When changes are detected, the AI summarizes the regulatory impact and re-embeds updated policy chunks into ChromaDB.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div class="card-label cl-amber">Impact Assessment</div>
+          <p style="font-size:13.5px;">For each new NCD/LCD, qwen3.6-35b generates a structured impact brief: which procedures are affected, which current claims may be at risk, and what documentation changes are required. This is exactly the "actionable compliance insight" PS 35 asks for.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: PS 31 -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="ps31">
+    <div class="wrap">
+      <div class="eyebrow">Problem Statement 31 — Data Backbone</div>
+      <h2>AI-Powered FHIR Interoperability Platform</h2>
+
+      <div class="card">
+        <div class="card-label cl-ink">Supporting Architecture Component</div>
+        <h3>The Exact Problem</h3>
+        <p>Healthcare data is fragmented across hospitals, payers, labs, and pharmacies. The opportunity: build an AI-powered FHIR-based interoperability platform that consolidates patient information into a single longitudinal record.</p>
+      </div>
+
+      <div class="notice rose" style="margin-top:20px;">
+        <p><strong>Why standalone PS 31 is a 2-year project, not a 48-hour hackathon:</strong> A true FHIR interoperability platform requires actual integration contracts with Epic/Cerner, live payer APIs, pharmacy system connectors, and real patient data pipelines. No team can demo this credibly in 48 hours. However — your demo can use the <strong>HAPI FHIR public test server</strong> (publicly available, free) to simulate FHIR R4 patient resource queries. You make a real FHIR API call, retrieve a synthetic patient record, and feed it into your PS 37 documentation AI. That's a real FHIR integration that takes 3 hours to build, not 2 years.</p>
+      </div>
+
+      <h4>How PS 31 Fits in the Demo</h4>
+      <div class="card" style="padding:20px 24px;">
+        <div style="display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--rule);">
+          <div style="font-family:var(--mono); font-size:11px; color:var(--teal); background:var(--teal-lt); padding:3px 8px; border-radius:3px; flex-shrink:0; margin-top:1px;">Step 1</div>
+          <div style="font-size:13.5px; color:var(--slate);">Demo opens with: <em>"Before the AI writes a single word, it pulls the patient's complete history."</em> Make a live <code>GET /Patient/[id]</code> call to the HAPI FHIR test server. Show the JSON response — allergies, past diagnoses, current medications — populating the patient sidebar in the UI.</div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--rule);">
+          <div style="font-family:var(--mono); font-size:11px; color:var(--teal); background:var(--teal-lt); padding:3px 8px; border-radius:3px; flex-shrink:0; margin-top:1px;">Step 2</div>
+          <div style="font-size:13.5px; color:var(--slate);">This patient context is injected into the PS 37 documentation prompt. The AI knows the patient is diabetic, on metformin, with a prior hospitalization for DKA — it writes documentation that reflects this history, not just today's chief complaint.</div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start; padding:12px 0;">
+          <div style="font-family:var(--mono); font-size:11px; color:var(--teal); background:var(--teal-lt); padding:3px 8px; border-radius:3px; flex-shrink:0; margin-top:1px;">Result</div>
+          <div style="font-size:13.5px; color:var(--slate);">You've now touched PS 31 in your architecture. When a judge asks "how does your system get patient data?" — "We query FHIR R4 endpoints. In production, this would connect to the hospital's Epic or Cerner FHIR API. In this demo, we're using the public HAPI test server."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: US HEALTHCARE PAIN POINTS -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="painpoints">
+    <div class="wrap">
+      <div class="eyebrow">BA Intelligence — US Market</div>
+      <h2>Ground-Truth Pain Points in US Healthcare</h2>
+      <p class="section-lead">As your Business Analyst, here are the validated market facts. Use these to anchor your pitch — every number should come out of your mouth during the presentation.</p>
+
+      <h3 style="margin-bottom:14px; font-size:18px;">Revenue Cycle & Denial Management</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Pain Point</th><th>Validated Metric</th><th>Source</th><th>PS Link</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Medical necessity denials</strong></td><td>Top reason for claim denial across all payer types</td><td>HFMA Revenue Cycle Survey 2024</td><td>PS 37 / 39</td></tr>
+            <tr><td><strong>Total denied claims value</strong></td><td>$262B annually across US healthcare</td><td>McKinsey RCM Analysis 2024</td><td>PS 37 / 39</td></tr>
+            <tr><td><strong>Cost to rework a denial</strong></td><td>$25–$180 per claim depending on complexity</td><td>AHA Trend Watch 2024</td><td>PS 39</td></tr>
+            <tr><td><strong>Denials never re-submitted</strong></td><td>58% of denied claims written off entirely</td><td>Becker's Hospital Review 2023</td><td>PS 39</td></tr>
+            <tr><td><strong>First-pass claim acceptance rate</strong></td><td>Industry avg. 62%; top performers reach 97%</td><td>Experian Health 2024</td><td>PS 37 / 39</td></tr>
+            <tr><td><strong>Prior auth burden</strong></td><td>45 PA requests/physician/week, 13 hrs staff time</td><td>AMA PA Survey 2024</td><td>PS 39</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-bottom:14px; font-size:18px; margin-top:28px;">Clinical Documentation Burden</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Pain Point</th><th>Validated Metric</th><th>Source</th><th>PS Link</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Physician EHR time daily</strong></td><td>4.5 hours/day — 37% of total work time</td><td>AMA Physician Work Life Study 2024</td><td>PS 37</td></tr>
+            <tr><td><strong>Physician burnout rate</strong></td><td>63% nationally; doc burden is #1 cause</td><td>Medscape National Physician Burnout 2024</td><td>PS 37</td></tr>
+            <tr><td><strong>"Pajama time" documentation</strong></td><td>Avg. 1.84 hrs/day after office hours</td><td>Stanford Medicine/JAMA 2023</td><td>PS 37</td></tr>
+            <tr><td><strong>Incomplete documentation rate</strong></td><td>25% of inpatient records have critical omissions</td><td>Joint Commission 2023</td><td>PS 37</td></tr>
+            <tr><td><strong>CDI specialist shortage</strong></td><td>Only 1 CDI specialist per 100 beds — vastly understaffed</td><td>ACDIS 2024</td><td>PS 37</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-bottom:14px; font-size:18px; margin-top:28px;">NCD/LCD & Regulatory Complexity</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Pain Point</th><th>Validated Metric</th><th>Source</th><th>PS Link</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Active CMS NCD/LCD policies</strong></td><td>11,000+ policies; updated 300–400 times per year</td><td>CMS Coverage Database 2024</td><td>PS 35 / 39</td></tr>
+            <tr><td><strong>Policy awareness gap</strong></td><td>67% of coders unaware of LCD changes within 30 days</td><td>AHIMA Compliance Survey 2024</td><td>PS 35</td></tr>
+            <tr><td><strong>Denials from NCD/LCD mismatch</strong></td><td>34% of medical necessity denials cite specific LCD non-compliance</td><td>Change Healthcare Denial Trends 2024</td><td>PS 39</td></tr>
+            <tr><td><strong>CMS 2027 FHIR PA mandate</strong></td><td>All Medicare Advantage/Medicaid plans must implement FHIR PA APIs</td><td>CMS Final Rule CMS-0057-F 2024</td><td>PS 31 / 39</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="margin-bottom:14px; font-size:18px; margin-top:28px;">Data Fragmentation</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Pain Point</th><th>Validated Metric</th><th>Source</th><th>PS Link</th></tr></thead>
+          <tbody>
+            <tr><td><strong>EHR interoperability</strong></td><td>Only 46% of hospitals exchange patient records with outside providers</td><td>ONC Health IT Dashboard 2023</td><td>PS 31</td></tr>
+            <tr><td><strong>Duplicate testing due to unavailable records</strong></td><td>$8.3B/year in redundant diagnostic tests</td><td>Pew Charitable Trusts 2023</td><td>PS 31</td></tr>
+            <tr><td><strong>Incomplete patient history at point of care</strong></td><td>82% of physicians report incomplete patient information during encounters</td><td>AMA Digital Medicine Survey 2024</td><td>PS 31 / 37</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notice" style="margin-top:24px;">
+        <p><strong>The Regulatory Tailwind to Cite:</strong> In January 2024, CMS finalized Rule CMS-0057-F requiring all Medicare Advantage, Medicaid, and CHIP plans to implement HL7 FHIR APIs for prior authorization by January 2027. This means every hospital in the US needs an NCD/LCD-compliant documentation and validation system in the next 18 months. You're not building a nice-to-have — you're building the solution to a regulatory deadline that's already law.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: MODEL STRATEGY -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="models">
+    <div class="wrap">
+      <div class="eyebrow">Tech Lead — Model Strategy</div>
+      <h2>Your GPU Stack, Precisely Assigned</h2>
+      <p class="section-lead">Five models available on your local GPU. Here is the exact role for each one, with reasoning. Correct model assignment is also a signal to technical judges that your team has system design maturity.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Size</th>
+              <th>Key Capabilities</th>
+              <th>Assigned Role</th>
+              <th>Context Used</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>qwen3.6-35b-a3b</code><br><span style="font-size:11px; color:var(--muted);">Instance 1</span></td>
+              <td>22GB<br>Q4_K_M</td>
+              <td>Vision, Tool Use, Reasoning ON, Long Context</td>
+              <td><strong>Documentation Generator (PS 37)</strong> — Processes encounter transcript + FHIR patient record, generates SOAP note with ICD-10/CPT codes. Reasoning mode identifies clinical significance.</td>
+              <td>120K — transcript + patient history</td>
+            </tr>
+            <tr>
+              <td><code>qwen3.6-35b-a3b</code><br><span style="font-size:11px; color:var(--muted);">Instance 2</span></td>
+              <td>22GB<br>Q4_K_M</td>
+              <td>Vision, Tool Use, Reasoning ON, Long Context</td>
+              <td><strong>NCD/LCD Validator (PS 39)</strong> — Ingests SOAP note + RAG-retrieved policy chunks, performs gap analysis, generates approval probability and checklist. Needs 240K for full policy docs.</td>
+              <td>240K — SOAP note + full policy docs</td>
+            </tr>
+            <tr>
+              <td><code>gemma-4-26b-a4b-qat</code></td>
+              <td>15.6GB<br>Q4_0</td>
+              <td>Vision, Tool Use, Reasoning, 262K max</td>
+              <td><strong>Independent Validator</strong> — Second-pass compliance check on PS 39 output. When Qwen and Gemma disagree on a coverage criterion, flag for human review. Also handles lab image OCR when Qwen Instance 1 is busy.</td>
+              <td>~40K per validation call</td>
+            </tr>
+            <tr>
+              <td><code>llama-3.2-1b-instruct</code></td>
+              <td>733MB<br>Q3_K_L</td>
+              <td>Fast text generation, 128K context</td>
+              <td><strong>Patient Summary & UI Responses</strong> — Converts the generated SOAP note into plain-English patient instructions. Also handles quick UI interactions (tooltip explanations, help text) with sub-second latency.</td>
+              <td>4K per summary call</td>
+            </tr>
+            <tr>
+              <td><code>phi-3.1-mini-4k</code></td>
+              <td>1.85GB<br>IQ3_M</td>
+              <td>Fast text, 4K context only</td>
+              <td><strong>Classification Tasks</strong> — Is this CPT code typically covered by this payer type? Is this a routine or complex encounter? Binary / short-form classification where the 4K limit is not a constraint.</td>
+              <td>Max 3K to leave headroom</td>
+            </tr>
+            <tr>
+              <td><code>nomic-embed-text-v1.5</code></td>
+              <td>84MB<br>Q4_K_M</td>
+              <td>Text embeddings, 2K context</td>
+              <td><strong>RAG Engine</strong> — Embeds all CMS NCD/LCD policy PDFs, ICD-10 code descriptions, and CPT guidelines into ChromaDB. Provides semantic retrieval at PS 39 validation time. Also used for regulatory change detection in PS 35 scheduler.</td>
+              <td>2K per chunk — chunk docs at 1500 tokens</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="notice rose">
+        <p><strong>⚠️ Do not use phi-2 (TheBloke Q2_K):</strong> This is a 2-bit quantized model with a 2,048-token context window — shorter than a single clinical encounter transcript. It will silently truncate inputs and produce clinically incorrect outputs. The Q2_K quantization at this model size significantly degrades reasoning quality. Exclude it from all healthcare inference tasks. It is not listed above for this reason.</p>
+      </div>
+
+      <h4 style="margin-top:24px;">Resource Allocation Strategy for Live Demo</h4>
+      <div class="g2">
+        <div class="card" style="padding:20px;">
+          <div class="card-label cl-teal">Pre-warm Both Qwen Instances</div>
+          <p style="font-size:13.5px;">Send a dummy 100-token prompt to both Qwen instances 5 minutes before the demo. A cold start on a 22GB GGUF model takes 30–90 seconds of silence in front of judges. Pre-warming loads all weights into GPU VRAM so generation starts in &lt;2 seconds.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div class="card-label cl-teal">ChromaDB Pre-indexed</div>
+          <p style="font-size:13.5px;">Embed your 3–5 sample NCD/LCD PDFs into ChromaDB before the demo begins. The Nomic embedding model at 84MB runs in milliseconds. Index at startup. Retrieval at query time is &lt;50ms for the top-k search — imperceptible to the judge.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: ARCHITECTURE HLD -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="arch">
+    <div class="wrap">
+      <div class="eyebrow">Technical Architecture</div>
+      <h2>High Level Design</h2>
+      <p class="section-lead">The complete system architecture, API contracts, and data flows needed to build the demo in 48 hours. Stack chosen for fastest hackathon build — not over-engineered.</p>
+
+      <div class="arch">
+        <div>
+<span class="c-teal">┌──────────────────────────────────────────────────────────────────────────┐</span>
+<span class="c-teal">│                     FRONTEND  (React + Vite + Tailwind)                  │</span>
+<span class="c-teal">│                           localhost:5173                                 │</span>
+│                                                                          │
+│  <span class="c-white">[ Screen 1: Encounter ]</span>   <span class="c-white">[ Screen 2: SOAP Note ]</span>   <span class="c-white">[ Screen 3: Validate ]</span>  │
+│  Audio recorder / paste    Editable 4-panel view   NCD/LCD Scorecard    │
+│  FHIR patient sidebar      ICD-10 / CPT chips       Approval gauge       │
+│  Real-time transcript      Confidence scores        Gap checklist        │
+<span class="c-teal">└────────────────────────────────────┬─────────────────────────────────────┘</span>
+                                     │ REST + SSE (streaming)
+<span class="c-teal">┌────────────────────────────────────▼─────────────────────────────────────┐</span>
+<span class="c-teal">│                      BACKEND  (FastAPI / Python 3.11)                    │</span>
+<span class="c-teal">│                           localhost:8000                                 │</span>
+│                                                                          │
+│  <span class="c-amber">POST /api/patient</span>        Calls HAPI FHIR test server → returns          │
+│                           structured patient JSON (PS 31 integration)    │
+│                                                                          │
+│  <span class="c-amber">POST /api/generate-soap</span>  Calls Qwen 35B Instance 1 (120K)             │
+│                           Input:  transcript + FHIR patient record       │
+│                           Output: { soap_note, icd10_codes, cpt_codes }  │
+│                                                                          │
+│  <span class="c-amber">POST /api/validate</span>       1. Nomic embed ICD codes → ChromaDB retrieval  │
+│                           2. Top-3 NCD/LCD chunks retrieved              │
+│                           3. Qwen 35B Instance 2 (240K) gap analysis     │
+│                           4. Gemma 26B independent validation pass       │
+│                           5. Merge scores → approval_probability         │
+│                           Output: { score, gaps[], checklist[], policy } │
+│                                                                          │
+│  <span class="c-amber">POST /api/summary</span>        Calls Llama 1B                                │
+│                           Input:  soap_note + language                   │
+│                           Output: plain-English patient instructions     │
+│                                                                          │
+│  <span class="c-amber">GET  /api/regulatory</span>     PS 35 scheduler endpoint — returns last       │
+│                           24h NCD/LCD changes detected                   │
+<span class="c-teal">└──────────────────┬───────────────────────────────────┬────────────────────┘</span>
+                   │                                   │
+<span class="c-teal">┌──────────────────▼─────────────┐  ┌─────────────────▼────────────────────┐</span>
+<span class="c-teal">│     LM Studio API              │  │        ChromaDB (Local)              │</span>
+<span class="c-teal">│     localhost:1234             │  │        localhost:8001                │</span>
+│                                │  │                                      │
+│  • qwen3.6-35b  inst.1 120K   │  │  Collection: ncd_lcd_policies        │
+│  • qwen3.6-35b  inst.2 240K   │  │  Collection: icd10_descriptions      │
+│  • gemma-4-26b                │  │  Collection: cpt_guidelines          │
+│  • llama-3.2-1b               │  │  Collection: regulatory_alerts       │
+│  • phi-3.1-mini               │  │                                      │
+│  • nomic-embed-text-v1.5      │  │  Embedding: nomic-embed-text-v1.5    │
+<span class="c-teal">└────────────────────────────────┘  └──────────────────────────────────────┘</span>
+        </div>
+      </div>
+
+      <h4 style="margin-top:28px;">3 UI Screens — Minimum Viable Interfaces</h4>
+      <div class="g3">
+        <div class="card" style="padding:20px;">
+          <div class="card-label cl-teal">Screen 1</div>
+          <h3 style="font-size:16px;">Encounter Capture</h3>
+          <p style="font-size:13px;">Audio record button or text paste area. Left sidebar shows FHIR patient data (auto-populated). Real-time transcription stream via SSE. "Generate Note" CTA.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div class="card-label cl-teal">Screen 2</div>
+          <h3 style="font-size:16px;">SOAP Note Editor</h3>
+          <p style="font-size:13px;">Four editable panels: S / O / A / P. ICD-10 codes shown as chips with confidence %. CPT codes suggested. "Run Validation" CTA that triggers PS 39.</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div class="card-label cl-indigo">Screen 3</div>
+          <h3 style="font-size:16px;">Validation Scorecard</h3>
+          <p style="font-size:13px;">Approval probability gauge (0–100%). Colour-coded gap checklist vs. NCD/LCD requirements. Policy source citations. "Improve Documentation" AI advisor.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: DEMO SCRIPT -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="demo">
+    <div class="wrap">
+      <div class="eyebrow">Demo Plan</div>
+      <h2>The 8-Minute Judge Demo Script</h2>
+      <p class="section-lead">This is your exact walkthrough. Memorise the bold phrases — those are your judge anchors. Everything else you can paraphrase naturally.</p>
+
+      <ul class="demo-list">
+        <li class="demo-item">
+          <div class="demo-time">0:00 – 1:00</div>
+          <div>
+            <div class="demo-title">The Hook — Lead With Pain, Not Tech</div>
+            <div class="demo-body">Open cold, no slide: <em>"Every year, $262 billion in valid US healthcare claims are denied. The #1 reason is not fraud — it's that the documentation didn't match the exact wording of the payer's coverage policy. A patient gets a CT scan, the physician does everything right, but the notes say 'headache' when the LCD requires 'persistent cephalgia unresponsive to conservative treatment.' That one phrase. Denied." </em> — Then: "We built an AI that makes sure that never happens again. Let me show you."</div>
+          </div>
+        </li>
+        <li class="demo-item">
+          <div class="demo-time">1:00 – 1:30</div>
+          <div>
+            <div class="demo-title">FHIR Patient Load (PS 31)</div>
+            <div class="demo-body">Click "Load Patient." A real FHIR API call goes to HAPI test server. Patient record populates the sidebar — name, DOB, allergies, diagnoses, current medications. Say: <strong>"Before the AI writes a single word, it knows the patient's complete history. We query FHIR R4 — the same API that Epic and Cerner expose in production."</strong></div>
+          </div>
+        </li>
+        <li class="demo-item">
+          <div class="demo-time">1:30 – 4:00</div>
+          <div>
+            <div class="demo-title">Clinical Encounter → SOAP Note (PS 37)</div>
+            <div class="demo-body">Play a pre-recorded 45-second audio clip of a simulated doctor-patient encounter (prepare beforehand — use a lower back pain case that has a specific LCD). Real-time transcription streams on screen. After clip ends, click "Generate Clinical Note." Qwen 35B Instance 1 generates the full SOAP note in ~20 seconds. Highlight: the Assessment section contains specific ICD-10 codes — not M54.5 (unspecified low back pain) but M51.16 (intervertebral disc degeneration, lumbar region) because the AI heard the physician mention radiculopathy. Say: <strong>"It didn't just transcribe. It clinically reasoned — and chose the specific code that actually satisfies Medicare's LCD for lumbar MRI coverage."</strong></div>
+          </div>
+        </li>
+        <li class="demo-item">
+          <div class="demo-time">4:00 – 6:30</div>
+          <div>
+            <div class="demo-title">NCD/LCD Validation (PS 39) — The Wow Moment</div>
+            <div class="demo-body">Without touching the SOAP note, click "Validate Against Payer Policy." Show the retrieval step on-screen: "Searching CMS LCD L35062 — Lumbar MRI..." (1 second). Two AI models run: Qwen Instance 2 and Gemma. Approval probability gauge animates to <strong>74%.</strong> A red-flagged gap appears: <em>"Documentation does not state duration of conservative treatment prior to MRI request — LCD L35062 requires minimum 6 weeks of conservative management documented."</em> Click "Fix This." The AI suggests exact language: <em>"Patient has undergone 7 weeks of physical therapy (documented by PT discharge summary dated [date]) with persistent radicular symptoms."</em> Copy the suggestion. Approval probability jumps to <strong>93%.</strong> Say: <strong>"That edit took 4 seconds. That claim was going to be denied. Now it won't be."</strong></div>
+          </div>
+        </li>
+        <li class="demo-item">
+          <div class="demo-time">6:30 – 7:15</div>
+          <div>
+            <div class="demo-title">System Self-Maintenance (PS 35)</div>
+            <div class="demo-body">Click "Regulatory Updates." Show a panel: "Last 24 hours — 2 LCD updates detected. LCD L34067 (Cognitive Tests) — coverage criteria expanded. L35101 (Sleep Studies) — documentation requirements tightened." Say: <strong>"Our system monitors the CMS coverage database every night and auto-updates the rules. When policies change, every validation check uses the latest criteria — with zero manual IT intervention."</strong></div>
+          </div>
+        </li>
+        <li class="demo-item">
+          <div class="demo-time">7:15 – 7:50</div>
+          <div>
+            <div class="demo-title">The "No Cloud" Moment — Your Decisive Edge</div>
+            <div class="demo-body">Have someone physically disconnect the ethernet cable from the demo laptop. Reload the app. Run the full PS 37 → PS 39 flow again. It works. Say: <strong>"Everything you just saw — the documentation AI, the NCD/LCD validation, the regulatory monitoring — runs on a single local GPU. No OpenAI. No cloud API. No PHI ever leaves this building. This is HIPAA-ready, on-premise clinical AI. That's not a feature. That's the reason hospital IT will approve this."</strong></div>
+          </div>
+        </li>
+        <li class="demo-item">
+          <div class="demo-time">7:50 – 8:00</div>
+          <div>
+            <div class="demo-title">Close</div>
+            <div class="demo-body">One sentence: <em>"We built a complete medical necessity denial prevention platform — documentation, validation, regulatory intelligence — all running locally, all referencing live CMS policy. Thank you."</em> Stop. Don't over-explain.</div>
+          </div>
+        </li>
+      </ul>
+
+      <h4 style="margin-top:28px;">Pre-Demo Preparation Checklist</h4>
+      <ul class="checklist">
+        <li>Pre-recorded encounter audio clip ready (45s, low back pain + radiculopathy case)</li>
+        <li>ChromaDB seeded: LCD L35062 (lumbar MRI), L34067 (cognitive tests), L35101 (sleep studies) — PDFs available free on CMS website</li>
+        <li>HAPI FHIR test patient ID confirmed working — test the GET call before demo</li>
+        <li>Both Qwen 35B instances pre-warmed (dummy prompt sent 5 min before)</li>
+        <li>Gemma 26B loaded and warmed</li>
+        <li>ChromaDB embeddings fully indexed (run indexing script night before)</li>
+        <li>UI running on localhost:5173 — tested in full demo flow × 3 dry runs</li>
+        <li>Backup: pre-generated SOAP note and validation output as static fallback screenshots</li>
+        <li>Ethernet cable physically on the table — visible prop for the "no cloud" moment</li>
+        <li>PS 35 regulatory panel showing 2 sample updates (mock or real)</li>
+        <li>Approval probability gauge starting at 74%, jumping to 93% after fix</li>
+        <li>ICD-10 code chip shows M51.16, not M54.5 — verify this in prompt engineering</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECTION: BUILD TIMELINE -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="section" id="timeline">
+    <div class="wrap">
+      <div class="eyebrow">Execution Plan</div>
+      <h2>48-Hour Build Timeline</h2>
+      <p class="section-lead">Assuming a 4-person team. Roles: 2 backend engineers, 1 frontend engineer, 1 BA/PM (that's you). Adjust for your team size.</p>
+
+      <div class="tl">
+        <div class="tl-item">
+          <div class="tl-phase">Hours 0–6 — Foundation</div>
+          <div class="tl-title">Environment, FHIR, and first Qwen call</div>
+          <div class="tl-body">Set up FastAPI skeleton. Test LM Studio connection to Qwen 35B Instance 1 and 2. Make the HAPI FHIR GET /Patient call and parse the response. Initialize ChromaDB. Download 3 LCD PDFs from CMS website and write the chunking + embedding script. Confirm nomic-embed is working. Get a raw transcript → SOAP note response from Qwen (no UI yet).</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Hours 6–16 — Core AI Pipeline</div>
+          <div class="tl-title">Documentation generation + NCD/LCD validation end-to-end</div>
+          <div class="tl-body">Build and test the full /api/generate-soap endpoint. Prompt-engineer Qwen to output structured JSON (SOAP sections + ICD-10 codes with confidence scores). Build /api/validate: RAG retrieval → Qwen Instance 2 gap analysis → Gemma second-pass → merge scoring logic. The approval probability formula: weighted average of both model scores, with Qwen weighted 0.6 and Gemma 0.4. Build Llama 1B patient summary endpoint.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Hours 16–28 — Frontend</div>
+          <div class="tl-title">All 3 screens, SSE streaming, FHIR sidebar</div>
+          <div class="tl-body">Build Screen 1 (encounter capture + FHIR sidebar), Screen 2 (SOAP editor + ICD chips), Screen 3 (validation scorecard + gap checklist + approval gauge). Wire up SSE streaming for real-time transcript display. Build the "Fix This" suggestion flow. The PS 35 regulatory panel (even static data is fine for demo). Mobile-tolerant layout.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Hours 28–40 — Integration & Polish</div>
+          <div class="tl-title">Full end-to-end, edge cases, visual polish</div>
+          <div class="tl-body">Run the complete demo flow 5 times. Fix failure points. Add loading states (spinners, progress bars) — dead UI during 20-second inference looks broken to judges. Add the approval probability animation (gauge animates from 74% to 93% on fix). Seed the PS 35 panel with 2 believable regulatory change entries.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Hours 40–47 — Demo Rehearsal</div>
+          <div class="tl-title">3 full dry runs, backup prep, pre-warm</div>
+          <div class="tl-body">Run the full 8-minute demo script 3 times with the real team. Time it. Fix any hesitation points. Capture static screenshots of every screen as backup. Prepare the ethernet cable prop. Pre-index ChromaDB one final time. Pre-warm both Qwen instances. Everyone in the team knows the BA pain point numbers by heart.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-phase">Hour 47–48 — Submission Buffer</div>
+          <div class="tl-title">Rest, last check, nothing new</div>
+          <div class="tl-body">No new features after hour 40. This hour is for sleep, a final smoke test, and confirming the demo laptop has everything needed offline. The "no cloud" moment requires the machine to literally work without internet — test this before the presentation room.</div>
+        </div>
+      </div>
+
+      <div class="card teal" style="margin-top:28px; padding:24px 28px;">
+        <div class="card-label cl-teal">Product Name Suggestion</div>
+        <h3 style="font-size:26px; font-family:'DM Serif Display', serif; color:var(--teal);">ClarityClaim</h3>
+        <p style="font-size:15px;">"Write it right. Validate before you submit."</p>
+        <p style="font-size:13.5px;">One platform — documentation intelligence, NCD/LCD validation, regulatory self-maintenance — all running on-premise. Built for the $262B denial problem that every hospital in America is losing money to right now.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background:var(--ink); border-top:1px solid var(--ink2); padding:32px 0;">
+    <div class="wrap">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div>
+          <div style="font-family:'DM Serif Display', serif; color:var(--white); font-size:16px;">ClarityClaim — Hackathon 2026</div>
+          <div style="color:var(--muted); font-size:12px; margin-top:4px; font-family:var(--mono);">Strategy & HLD · PS 37 + 39 Primary · PS 31 + 35 Supporting · Corrected Brief v2</div>
+        </div>
+        <div class="pill-row">
+          <div class="pill-dark hi">PS 37 + PS 39</div>
+          <div class="pill-dark">qwen3.6-35b × 2</div>
+          <div class="pill-dark">gemma4-26b validator</div>
+          <div class="pill-dark">nomic RAG</div>
+          <div class="pill-dark">FHIR R4 + CMS LCD</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</body>
+</html>

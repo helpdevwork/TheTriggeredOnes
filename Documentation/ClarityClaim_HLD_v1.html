@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClarityClaim — Architect HLD v1.0</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg:        #f4f4f4;
+    --surface:   #ffffff;
+    --surface2:  #f4f4f4;
+    --border:    #e0e0e0;
+    --border2:   #c6c6c6;
+    --ink:       #161616;
+    --ink2:      #393939;
+    --slate:     #525252;
+    --muted:     #6f6f6f;
+    --light:     #a8a8a8;
+    --blue:      #0f62fe;
+    --blue-lt:   #edf5ff;
+    --blue-dk:   #002d9c;
+    --teal:      #007d79;
+    --teal-lt:   #d9fbfb;
+    --green:     #198038;
+    --green-lt:  #defbe6;
+    --amber:     #b28600;
+    --amber-lt:  #fdf6dd;
+    --red:       #da1e28;
+    --red-lt:    #fff1f1;
+    --purple:    #6929c4;
+    --purple-lt: #f6f2ff;
+    --mono:      'IBM Plex Mono', monospace;
+    --serif:     'IBM Plex Serif', serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── SIDEBAR ──────────────────────────────────── */
+  .sidebar {
+    position: fixed; top: 0; left: 0;
+    width: 240px; height: 100vh;
+    background: var(--ink);
+    overflow-y: auto;
+    z-index: 100;
+    display: flex; flex-direction: column;
+  }
+  .sidebar-brand {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid #393939;
+  }
+  .brand-name {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .brand-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #6f6f6f;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .nav-group {
+    padding: 16px 0 0;
+  }
+  .nav-group-label {
+    padding: 0 20px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #525252;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .sidebar a {
+    display: block;
+    padding: 6px 20px;
+    font-size: 12.5px;
+    color: #a8a8a8;
+    text-decoration: none;
+    transition: all 0.12s;
+    border-left: 2px solid transparent;
+  }
+  .sidebar a:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+    border-left-color: var(--blue);
+  }
+
+  /* ── LAYOUT ───────────────────────────────────── */
+  .main { margin-left: 240px; }
+
+  /* ── HERO ─────────────────────────────────────── */
+  .hero {
+    background: var(--ink);
+    padding: 56px 64px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.015) 0px,
+      rgba(255,255,255,0.015) 1px,
+      transparent 1px,
+      transparent 48px
+    );
+    pointer-events: none;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--blue);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    max-width: 640px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 span { color: #4589ff; }
+  .hero-desc {
+    color: #a8a8a8;
+    max-width: 560px;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .meta-chip {
+    background: #262626;
+    border: 1px solid #393939;
+    border-radius: 2px;
+    padding: 4px 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #a8a8a8;
+  }
+  .meta-chip.blue { border-color: #0f62fe; color: #78a9ff; }
+  .meta-chip.teal { border-color: var(--teal); color: #3ddbd9; }
+
+  /* ── SECTIONS ─────────────────────────────────── */
+  .section {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 64px;
+  }
+  .section:last-child { border-bottom: none; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--blue);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(22px, 2.5vw, 32px);
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  h3 {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    margin-top: 24px;
+  }
+  h4:first-child { margin-top: 0; }
+  p { color: var(--slate); margin-bottom: 12px; }
+  p:last-child { margin-bottom: 0; }
+  strong { color: var(--ink); font-weight: 600; }
+
+  .section-lead {
+    color: var(--slate);
+    font-size: 15px;
+    max-width: 680px;
+    margin-bottom: 32px;
+    padding-left: 14px;
+    border-left: 3px solid var(--blue);
+  }
+
+  /* ── CARDS ────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+  .card.blue-top  { border-top: 3px solid var(--blue); }
+  .card.teal-top  { border-top: 3px solid var(--teal); }
+  .card.green-top { border-top: 3px solid var(--green); }
+  .card.amber-top { border-top: 3px solid var(--amber); }
+  .card.red-top   { border-top: 3px solid var(--red); }
+  .card.purple-top{ border-top: 3px solid var(--purple); }
+  .card.dark {
+    background: var(--ink);
+    border-color: #393939;
+  }
+  .card.dark p { color: #a8a8a8; }
+  .card.dark h3 { color: #fff; }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+  }
+  .tag-blue   { background: var(--blue-lt);   color: var(--blue-dk); }
+  .tag-teal   { background: var(--teal-lt);   color: var(--teal); }
+  .tag-green  { background: var(--green-lt);  color: var(--green); }
+  .tag-amber  { background: var(--amber-lt);  color: var(--amber); }
+  .tag-red    { background: var(--red-lt);    color: var(--red); }
+  .tag-purple { background: var(--purple-lt); color: var(--purple); }
+  .tag-dark   { background: #393939;          color: #a8a8a8; }
+
+  /* ── GRIDS ────────────────────────────────────── */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .g4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+
+  /* ── CODE BLOCK ───────────────────────────────── */
+  .codeblock {
+    background: #161616;
+    border-radius: 2px;
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: #a8a8a8;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin: 16px 0;
+    border: 1px solid #393939;
+  }
+  .codeblock .c-blue  { color: #78a9ff; }
+  .codeblock .c-teal  { color: #3ddbd9; }
+  .codeblock .c-amber { color: #f1c21b; }
+  .codeblock .c-green { color: #42be65; }
+  .codeblock .c-red   { color: #ff8389; }
+  .codeblock .c-muted { color: #525252; }
+
+  /* ── TABLE ────────────────────────────────────── */
+  .tbl {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 16px 0;
+    width: 100%;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: var(--ink);
+    color: #a8a8a8;
+    padding: 10px 14px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid #393939;
+  }
+  tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--slate);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface2); }
+  td strong { color: var(--ink); }
+  code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    padding: 1px 6px;
+    color: var(--blue);
+  }
+
+  /* ── NOTICE ───────────────────────────────────── */
+  .notice {
+    border-left: 3px solid var(--blue);
+    background: var(--blue-lt);
+    padding: 14px 16px;
+    margin: 16px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  .notice.amber { border-left-color: var(--amber); background: var(--amber-lt); }
+  .notice.red   { border-left-color: var(--red);   background: var(--red-lt);   }
+  .notice.green { border-left-color: var(--green); background: var(--green-lt); }
+  .notice p { color: var(--ink2); font-size: 13.5px; }
+
+  /* ── SCORE BARS ───────────────────────────────── */
+  .bar { margin: 8px 0; }
+  .bar-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--slate); margin-bottom: 3px; }
+  .bar-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; background: var(--blue); }
+  .bar-fill.green  { background: var(--green); }
+  .bar-fill.amber  { background: var(--amber); }
+
+  /* ── STEP BOXES ───────────────────────────────── */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--blue);
+    background: var(--blue-lt);
+    border-radius: 2px;
+    padding: 3px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; font-size: 13.5px; }
+  .step-body  { font-size: 13px; color: var(--slate); line-height: 1.65; }
+
+  /* ── TIMELINE ─────────────────────────────────── */
+  .tl { border-left: 2px solid var(--border); padding-left: 24px; }
+  .tl-item { position: relative; padding-bottom: 24px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -31px; top: 5px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--blue);
+    border: 2px solid var(--bg);
+  }
+  .tl-tag { font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 3px; }
+  .tl-title { font-weight: 600; color: var(--ink); margin-bottom: 4px; font-size: 14px; }
+  .tl-body  { font-size: 13px; color: var(--slate); }
+
+  /* ── CHECKLIST ────────────────────────────────── */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px; color: var(--slate);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .checklist li.warn::before { content: '!'; color: var(--amber); }
+  .checklist li.todo::before { content: '○'; color: var(--blue); }
+
+  /* ── STAT GRID ────────────────────────────────── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+  .stat-cell { background: var(--surface); padding: 18px 20px; }
+  .stat-num { font-family: var(--serif); font-size: 28px; font-weight: 600; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+  .stat-num.blue   { color: var(--blue); }
+  .stat-num.teal   { color: var(--teal); }
+  .stat-num.green  { color: var(--green); }
+  .stat-num.amber  { color: var(--amber); }
+  .stat-lbl { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  /* ── RESPONSIVE ───────────────────────────────── */
+  @media (max-width: 960px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .hero, .section { padding: 40px 24px; }
+    .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">ClarityClaim</div>
+    <div class="brand-sub">Architect HLD — v1.0</div>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Foundation</div>
+    <a href="#overview">System Overview</a>
+    <a href="#principles">Architecture Principles</a>
+    <a href="#context">Resource Context</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Components</div>
+    <a href="#component-whisper">Whisper STT</a>
+    <a href="#component-backend">FastAPI Backend</a>
+    <a href="#component-rag">RAG Pipeline</a>
+    <a href="#component-models">Model Layer</a>
+    <a href="#component-fhir">FHIR Integration</a>
+    <a href="#component-frontend">React Frontend</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Design</div>
+    <a href="#dataflow">End-to-End Data Flow</a>
+    <a href="#api">API Contracts</a>
+    <a href="#screens">UI Screens</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-group-label">Execution</div>
+    <a href="#setup">Pre-Event Setup</a>
+    <a href="#build">48h Build Plan</a>
+    <a href="#risks">Risks & Mitigations</a>
+    <a href="#demo">Demo Runbook</a>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ═════════════════════════════════════════════ -->
+<div class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">ClarityClaim — Architect High Level Design — v1.0</div>
+  <h1>The complete blueprint.<br><span>Start building today.</span></h1>
+  <p class="hero-desc">Architecture specification for an on-premise AI clinical documentation and NCD/LCD validation platform. Built on local GPU models — no cloud API, no PHI exposure. Designed to be demo-ready in 48 hours.</p>
+  <div class="hero-meta">
+    <div class="meta-chip blue">PS 37 + PS 39 Primary</div>
+    <div class="meta-chip teal">PS 31 via HAPI FHIR</div>
+    <div class="meta-chip">PS 35 Background Layer</div>
+    <div class="meta-chip">Qwen3.6 35B × 2</div>
+    <div class="meta-chip">Gemma4 26B</div>
+    <div class="meta-chip">Whisper Local STT</div>
+    <div class="meta-chip">ChromaDB RAG</div>
+    <div class="meta-chip">FHIR R4</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 1: SYSTEM OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="overview">
+  <div class="eyebrow">Section 01</div>
+  <h2>System Overview</h2>
+  <p class="section-lead">ClarityClaim is a three-stage AI pipeline that takes a doctor-patient encounter as input and produces a validated, insurance-ready clinical note as output — entirely on-premise, with no external AI APIs.</p>
+
+  <div class="codeblock">
+<span class="c-teal">INPUT</span>  →  <span class="c-blue">Doctor-Patient Audio / Text</span>
+         +  <span class="c-blue">Patient FHIR Record (HAPI R4)</span>
+                    │
+                    ▼
+<span class="c-amber">STAGE 1 — PS 37</span>  <span class="c-muted">AI Clinical Documentation</span>
+  <span class="c-muted">Whisper STT → transcript</span>
+  <span class="c-muted">Qwen3.6-35B (120K) → SOAP Note + ICD-10 + CPT codes</span>
+                    │
+                    ▼
+<span class="c-amber">STAGE 2 — PS 39</span>  <span class="c-muted">NCD/LCD Medical Necessity Validation</span>
+  <span class="c-muted">Nomic Embed → ChromaDB → retrieve top-3 NCD/LCD policy chunks</span>
+  <span class="c-muted">Qwen3.6-35B (240K) → gap analysis + approval probability</span>
+  <span class="c-muted">Gemma4-26B         → independent second-pass compliance check</span>
+  <span class="c-muted">Merge scores → Scorecard + Fix suggestions</span>
+                    │
+                    ▼
+<span class="c-amber">STAGE 3 — PS 39 Bonus</span>  <span class="c-muted">Patient Summary</span>
+  <span class="c-muted">Llama3.2-1B → plain-English patient note (multilingual)</span>
+                    │
+                    ▼
+<span class="c-teal">OUTPUT</span> →  <span class="c-blue">Validated SOAP Note</span>
+         +  <span class="c-blue">Approval Probability Score (0–100%)</span>
+         +  <span class="c-blue">Gap Checklist with Fix Suggestions</span>
+         +  <span class="c-blue">Patient-Friendly Summary</span>
+
+<span class="c-muted">─────────────────────────────────────────────────</span>
+<span class="c-amber">BACKGROUND — PS 35</span>  <span class="c-muted">Regulatory Intelligence (nightly)</span>
+  <span class="c-muted">Python scheduler → CMS website → parse new NCD/LCD PDFs</span>
+  <span class="c-muted">Qwen3.6-35B → summarise regulatory impact</span>
+  <span class="c-muted">Nomic Embed → re-index ChromaDB collection</span>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-cell">
+      <div class="stat-num blue">7</div>
+      <div class="stat-lbl">Total components to build or configure</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num green">4</div>
+      <div class="stat-lbl">Setup tasks — no code, just config + downloads</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num amber">3</div>
+      <div class="stat-lbl">Development tasks — build from scratch</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num teal">0</div>
+      <div class="stat-lbl">External AI API keys required</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num blue">48h</div>
+      <div class="stat-lbl">Target time to demo-ready state</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num green">100%</div>
+      <div class="stat-lbl">On-premise — works with internet disconnected</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 2: ARCHITECTURE PRINCIPLES -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="principles">
+  <div class="eyebrow">Section 02</div>
+  <h2>Architecture Principles</h2>
+  <p class="section-lead">These five decisions govern every component design choice in this document. Any team member building a component should check their approach against these before writing a line of code.</p>
+
+  <div class="g2">
+    <div class="card blue-top">
+      <div class="tag tag-blue">P1 — Local-First</div>
+      <h3>Everything runs on the GPU machine</h3>
+      <p>No model inference call leaves the local network. LM Studio serves all models at <code>localhost:1234</code>. ChromaDB runs at <code>localhost:8001</code>. The backend runs at <code>localhost:8000</code>. The frontend at <code>localhost:5173</code>. The demo must work with the ethernet cable physically unplugged. This is non-negotiable — it is the single biggest differentiator from every competing team.</p>
+    </div>
+    <div class="card blue-top">
+      <div class="tag tag-blue">P2 — One Data Object</div>
+      <h3>A single JSON object flows through all stages</h3>
+      <p>The <code>ClinicalRecord</code> object is created in Stage 1 and enriched at every subsequent stage. No data is re-entered. No redundant API calls. The FHIR patient record, the transcript, the SOAP note, the ICD codes, and the validation scorecard all live inside one object that the frontend renders progressively as each stage completes.</p>
+    </div>
+    <div class="card teal-top">
+      <div class="tag tag-teal">P3 — Right Model, Right Task</div>
+      <h3>Each model is assigned exactly one job</h3>
+      <p>Qwen3.6-35B Instance 1 owns documentation generation. Instance 2 owns validation. Gemma4-26B owns second-pass compliance. Llama3.2-1B owns patient summaries. Phi3.1-mini owns fast classification. Nomic owns embeddings. No model is used outside its assignment. Phi-2 is excluded entirely. This prevents GPU memory contention and keeps inference times predictable.</p>
+    </div>
+    <div class="card teal-top">
+      <div class="tag tag-teal">P4 — Fail Gracefully in Demo</div>
+      <h3>Every live call has a static fallback</h3>
+      <p>Before the hackathon presentation, pre-generate the SOAP note, validation result, and patient summary for the demo scenario and save as JSON files. If any live inference call takes too long or errors during the demo, the frontend silently serves the pre-generated fallback. Judges see a seamless demo. This is architectural insurance, not cheating.</p>
+    </div>
+    <div class="card amber-top">
+      <div class="tag tag-amber">P5 — Build for Demo, Not Production</div>
+      <h3>Complexity stops at demo requirements</h3>
+      <p>No authentication, no database persistence, no multi-user sessions, no deployment infrastructure. The backend is stateless per request. ChromaDB is file-persisted on disk. Everything is localhost. The 48-hour clock is real — every hour spent on production features is an hour stolen from demo polish. YAGNI applies hard here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 3: RESOURCE CONTEXT -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="context">
+  <div class="eyebrow">Section 03</div>
+  <h2>Resource Context</h2>
+  <p class="section-lead">Complete map of what you have, what needs setup, and what needs to be built. The 4 setup tasks happen before the hackathon starts. The 3 dev tasks are your 48-hour build scope.</p>
+
+  <h4>Models — Already on GPU (No action needed)</h4>
+  <div class="tbl"><table>
+    <thead><tr><th>Model</th><th>Size</th><th>Context</th><th>Capabilities</th><th>Assigned Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>qwen/qwen3.6-35b-a3b</code> Instance 1</td><td>22GB Q4_K_M</td><td>120K</td><td>Vision, Tool Use, Reasoning</td><td><strong>SOAP Note + ICD-10 Generation (PS 37)</strong></td></tr>
+      <tr><td><code>qwen/qwen3.6-35b-a3b</code> Instance 2</td><td>22GB Q4_K_M</td><td>240K</td><td>Vision, Tool Use, Reasoning</td><td><strong>NCD/LCD Gap Analysis (PS 39)</strong></td></tr>
+      <tr><td><code>google/gemma-4-26b-a4b-qat</code></td><td>15.6GB Q4_0</td><td>262K</td><td>Vision, Tool Use, Reasoning</td><td><strong>Independent Compliance Validator</strong></td></tr>
+      <tr><td><code>llama-3.2-1b-instruct</code></td><td>733MB Q3_K_L</td><td>128K</td><td>Text generation</td><td><strong>Patient Summary (plain English + multilingual)</strong></td></tr>
+      <tr><td><code>phi-3.1-mini-4k-instruct</code></td><td>1.85GB IQ3_M</td><td>4K</td><td>Text generation</td><td><strong>Fast classification tasks only</strong></td></tr>
+      <tr><td><code>text-embedding-nomic-embed-text-v1.5</code></td><td>84MB Q4_K_M</td><td>2K</td><td>Embeddings</td><td><strong>RAG — embed + retrieve NCD/LCD policy chunks</strong></td></tr>
+      <tr><td><code>phi-2 (TheBloke Q2_K)</code></td><td>1.17GB Q2_K</td><td>2048</td><td>Text only</td><td style="color: var(--red);"><strong>EXCLUDED — context too small, quality too low</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Setup Tasks — 4 items, ~2 hours total, before hackathon</h4>
+  <div class="g2">
+    <div class="card green-top" style="padding:18px 20px;">
+      <div class="tag tag-green">Setup 1 — ~10 min</div>
+      <h3 style="font-size:15px;">Download NCD/LCD PDFs from CMS</h3>
+      <p style="font-size:13px;">Go to <strong>cms.gov/medicare-coverage-database</strong>. Download the following for your demo scenario (low back pain + radiculopathy): <strong>LCD L35062</strong> (Lumbar MRI), <strong>LCD L34067</strong> (Cognitive Tests), <strong>LCD L35101</strong> (Sleep Studies). Save to <code>/data/policies/</code>. These are free, public, no login required.</p>
+    </div>
+    <div class="card green-top" style="padding:18px 20px;">
+      <div class="tag tag-green">Setup 2 — ~5 min</div>
+      <h3 style="font-size:15px;">pip install ChromaDB</h3>
+      <p style="font-size:13px;">On the backend machine: <code>pip install chromadb pypdf sentence-transformers</code>. ChromaDB is the local vector store. It persists to disk at <code>/data/chromadb/</code>. No server process needed — Python imports it directly. Run the indexing script (built in Hours 0–4) once after install.</p>
+    </div>
+    <div class="card green-top" style="padding:18px 20px;">
+      <div class="tag tag-green">Setup 3 — ~30 min</div>
+      <h3 style="font-size:15px;">Install Whisper locally</h3>
+      <p style="font-size:13px;"><code>pip install openai-whisper</code> — this is OpenAI's open-source Whisper, runs 100% locally, free, no API key. Use model size <strong>medium</strong> or <strong>large-v3</strong> for clinical accuracy. Test with: <code>whisper audio.mp3 --model medium --language en</code>. Outputs a transcript text file the backend reads directly.</p>
+    </div>
+    <div class="card green-top" style="padding:18px 20px;">
+      <div class="tag tag-green">Setup 4 — ~15 min</div>
+      <h3 style="font-size:15px;">Cache HAPI FHIR test patient</h3>
+      <p style="font-size:13px;">Make one GET call to <code>https://hapi.fhir.org/baseR4/Patient/[id]</code> and save the JSON response to <code>/data/fhir_patient_cache.json</code>. Also call <code>/Condition</code>, <code>/MedicationRequest</code>, <code>/AllergyIntolerance</code> for the same patient ID. The backend serves from this cache — works fully offline during the demo.</p>
+    </div>
+  </div>
+
+  <h4>Development Tasks — 3 items, core 48-hour build scope</h4>
+  <div class="g3">
+    <div class="card blue-top" style="padding:18px 20px;">
+      <div class="tag tag-blue">Dev 1 — ~8h</div>
+      <h3 style="font-size:15px;">FastAPI Backend</h3>
+      <p style="font-size:13px;">Python REST API with 6 endpoints. Routes requests to LM Studio, ChromaDB, Whisper, and FHIR cache. Handles SSE streaming for real-time transcript display. ~200 lines of Python. Primary backend engineer owns this.</p>
+    </div>
+    <div class="card blue-top" style="padding:18px 20px;">
+      <div class="tag tag-blue">Dev 2 — ~12h</div>
+      <h3 style="font-size:15px;">React Frontend</h3>
+      <p style="font-size:13px;">3 screens: Encounter Capture, SOAP Note Editor, Validation Scorecard. Vite + React + Tailwind. SSE streaming for transcript. Approval probability gauge. Gap checklist. ~600 lines of JSX. Frontend engineer owns this.</p>
+    </div>
+    <div class="card blue-top" style="padding:18px 20px;">
+      <div class="tag tag-blue">Dev 3 — ~3h</div>
+      <h3 style="font-size:15px;">PDF Chunking + RAG Pipeline</h3>
+      <p style="font-size:13px;">One-time Python script: read NCD/LCD PDFs → chunk at 1500 tokens → embed via Nomic → store in ChromaDB. Runs once before demo, never during. Also the retrieval function used by the validation endpoint. ~50 lines of Python.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 4: COMPONENT — WHISPER STT -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="component-whisper">
+  <div class="eyebrow">Component 01</div>
+  <h2>Whisper — Local Speech-to-Text</h2>
+  <p class="section-lead">Whisper converts the clinical encounter audio into a text transcript that Stage 1 (Qwen documentation) processes. It runs entirely on-device, processes pre-recorded files, and outputs plain text.</p>
+
+  <div class="g2">
+    <div>
+      <h4>What it does</h4>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">Input</div>
+          <div><div class="step-title">Audio file (.mp3 / .wav / .m4a)</div><div class="step-body">Received from the frontend recorder or uploaded directly. Backend saves to <code>/tmp/encounter.wav</code>.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Process</div>
+          <div><div class="step-title">Local Whisper inference</div><div class="step-body">Python calls <code>whisper.transcribe("encounter.wav", language="en")</code>. Uses <strong>medium</strong> model (~1.5GB). No GPU contention with LLMs — runs on CPU or separate VRAM allocation. Takes 15–45 seconds for a 60-second clip.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Output</div>
+          <div><div class="step-title">Plain text transcript + timestamps</div><div class="step-body">Whisper returns a dict with <code>text</code> (full transcript) and <code>segments</code> (timestamped sentences). The backend streams segments to the frontend via SSE for the real-time effect, then sends the full text to Qwen.</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4>Configuration</h4>
+      <div class="card" style="padding:18px 20px;">
+        <div class="tag tag-blue">Model Selection</div>
+        <p style="font-size:13px;">Use <strong>medium</strong> for the hackathon. Large-v3 is more accurate but slower. Medium handles clinical terminology reliably. <strong>Do not use tiny or base</strong> — they misrecognize medical terms like "radiculopathy", "metformin", "HbA1c".</p>
+      </div>
+      <div class="card" style="padding:18px 20px; margin-top:0;">
+        <div class="tag tag-amber">Demo Safety</div>
+        <p style="font-size:13px;">For the live demo, use a <strong>pre-recorded 45-second audio clip</strong> rather than live microphone recording. This eliminates background noise, ensures consistent timing, and removes the STT failure as a live risk point. The pre-recorded clip is played through the UI's audio recorder control.</p>
+      </div>
+      <div class="card" style="padding:18px 20px; margin-top:0;">
+        <div class="tag tag-teal">Offline Capable</div>
+        <p style="font-size:13px;">Whisper is fully local after install. No internet connection needed. The model weights are downloaded once at install time and cached locally.</p>
+      </div>
+    </div>
+  </div>
+
+  <h4>Python Integration (Backend)</h4>
+  <div class="codeblock"><span class="c-muted"># whisper_service.py</span>
+<span class="c-blue">import</span> whisper
+<span class="c-blue">import</span> json
+
+model = whisper.load_model(<span class="c-green">"medium"</span>)  <span class="c-muted"># load once at startup</span>
+
+<span class="c-blue">def</span> <span class="c-teal">transcribe_audio</span>(audio_path: str) -> dict:
+    result = model.transcribe(audio_path, language=<span class="c-green">"en"</span>)
+    <span class="c-blue">return</span> {
+        <span class="c-green">"full_text"</span>:  result[<span class="c-green">"text"</span>],
+        <span class="c-green">"segments"</span>:   result[<span class="c-green">"segments"</span>],  <span class="c-muted"># [{start, end, text}, ...]</span>
+        <span class="c-green">"language"</span>:   result[<span class="c-green">"language"</span>]
+    }</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 5: COMPONENT — FASTAPI BACKEND -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="component-backend">
+  <div class="eyebrow">Component 02</div>
+  <h2>FastAPI Backend</h2>
+  <p class="section-lead">The backend is the orchestration layer. It receives requests from the React frontend, calls the right models via LM Studio's API, and returns structured responses. It runs at <code>localhost:8000</code>.</p>
+
+  <h4>Endpoint Map — 6 routes</h4>
+  <div class="tbl"><table>
+    <thead><tr><th>Method</th><th>Route</th><th>Input</th><th>Model Called</th><th>Output</th><th>PS</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/api/transcribe</code></td><td>Audio file (.wav)</td><td>Whisper (local)</td><td>{ full_text, segments }</td><td>PS 37</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/patient/{id}</code></td><td>Patient ID string</td><td>HAPI FHIR (cached)</td><td>{ name, dob, conditions, meds, allergies }</td><td>PS 31</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/generate-soap</code></td><td>{ transcript, patient_context }</td><td>Qwen 35B — Instance 1 (120K)</td><td>{ soap_note, icd10_codes, cpt_codes }</td><td>PS 37</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/validate</code></td><td>{ soap_note, icd10_codes }</td><td>Nomic → ChromaDB → Qwen Instance 2 → Gemma4</td><td>{ score, gaps[], fixes[], policy_ref }</td><td>PS 39</td></tr>
+      <tr><td><code>POST</code></td><td><code>/api/patient-summary</code></td><td>{ soap_note, language }</td><td>Llama 3.2 1B</td><td>{ summary_text }</td><td>PS 39</td></tr>
+      <tr><td><code>GET</code></td><td><code>/api/regulatory</code></td><td>—</td><td>Static JSON (mock for demo)</td><td>{ updates: [{lcd_id, title, change}] }</td><td>PS 35</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>LM Studio API Call Pattern</h4>
+  <div class="codeblock"><span class="c-muted"># All model calls use LM Studio's OpenAI-compatible endpoint</span>
+<span class="c-blue">import</span> httpx
+
+LM_STUDIO_BASE = <span class="c-green">"http://localhost:1234/v1"</span>
+
+<span class="c-blue">async def</span> <span class="c-teal">call_model</span>(
+    model_id: str,        <span class="c-muted"># e.g. "qwen/qwen3.6-35b-a3b"</span>
+    messages: list,       <span class="c-muted"># OpenAI message format</span>
+    temperature: float = <span class="c-amber">0.1</span>,  <span class="c-muted"># low temp for clinical accuracy</span>
+    max_tokens: int = <span class="c-amber">4096</span>
+) -> str:
+    <span class="c-blue">async with</span> httpx.AsyncClient(timeout=<span class="c-amber">120.0</span>) <span class="c-blue">as</span> client:
+        resp = <span class="c-blue">await</span> client.post(
+            f<span class="c-green">"{LM_STUDIO_BASE}/chat/completions"</span>,
+            json={
+                <span class="c-green">"model"</span>: model_id,
+                <span class="c-green">"messages"</span>: messages,
+                <span class="c-green">"temperature"</span>: temperature,
+                <span class="c-green">"max_tokens"</span>: max_tokens,
+            }
+        )
+        <span class="c-blue">return</span> resp.json()[<span class="c-green">"choices"</span>][<span class="c-amber">0</span>][<span class="c-green">"message"</span>][<span class="c-green">"content"</span>]
+
+<span class="c-muted"># Instance 2 (240K) uses different model identifier</span>
+QWEN_INSTANCE_1 = <span class="c-green">"qwen/qwen3.6-35b-a3b"</span>
+QWEN_INSTANCE_2 = <span class="c-green">"qwen/qwen3.6-35b-a3b:2"</span>
+GEMMA            = <span class="c-green">"google/gemma-4-26b-a4b-qat"</span>
+LLAMA            = <span class="c-green">"llama-3.2-1b-instruct"</span></div>
+
+  <h4>Validation Endpoint — Multi-Model Logic</h4>
+  <div class="codeblock"><span class="c-muted"># /api/validate — the most important endpoint</span>
+<span class="c-blue">async def</span> <span class="c-teal">validate_soap</span>(soap_note: str, icd10_codes: list) -> dict:
+
+    <span class="c-muted"># Step 1: Retrieve relevant NCD/LCD policy chunks via RAG</span>
+    query = f<span class="c-green">"{' '.join(icd10_codes)} medical necessity documentation"</span>
+    policy_chunks = chromadb_retrieve(query, top_k=<span class="c-amber">3</span>)
+
+    <span class="c-muted"># Step 2: Qwen Instance 2 — primary gap analysis (240K ctx)</span>
+    qwen_prompt = build_validation_prompt(soap_note, policy_chunks)
+    qwen_result = <span class="c-blue">await</span> call_model(QWEN_INSTANCE_2, qwen_prompt)
+    qwen_parsed = parse_json_response(qwen_result)
+    <span class="c-muted"># returns: { gaps: [...], approval_score: 0-100, fixes: [...] }</span>
+
+    <span class="c-muted"># Step 3: Gemma — independent second-pass compliance check</span>
+    gemma_prompt = build_compliance_check_prompt(soap_note, policy_chunks)
+    gemma_result = <span class="c-blue">await</span> call_model(GEMMA, gemma_prompt)
+    gemma_parsed = parse_json_response(gemma_result)
+
+    <span class="c-muted"># Step 4: Merge scores (Qwen weighted 0.6, Gemma 0.4)</span>
+    final_score = round(
+        qwen_parsed[<span class="c-green">"approval_score"</span>] * <span class="c-amber">0.6</span> +
+        gemma_parsed[<span class="c-green">"approval_score"</span>] * <span class="c-amber">0.4</span>
+    )
+
+    <span class="c-muted"># Step 5: Flag disagreements for human review</span>
+    disagreements = find_disagreements(qwen_parsed, gemma_parsed)
+
+    <span class="c-blue">return</span> {
+        <span class="c-green">"approval_probability"</span>: final_score,
+        <span class="c-green">"gaps"</span>:                qwen_parsed[<span class="c-green">"gaps"</span>],
+        <span class="c-green">"fixes"</span>:               qwen_parsed[<span class="c-green">"fixes"</span>],
+        <span class="c-green">"policy_references"</span>:   [c[<span class="c-green">"source"</span>] <span class="c-blue">for</span> c <span class="c-blue">in</span> policy_chunks],
+        <span class="c-green">"human_review_flags"</span>:  disagreements
+    }</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 6: COMPONENT — RAG PIPELINE -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="component-rag">
+  <div class="eyebrow">Component 03</div>
+  <h2>RAG Pipeline — NCD/LCD Policy Retrieval</h2>
+  <p class="section-lead">The RAG pipeline is what makes PS 39 technically credible. Instead of asking the LLM to reason from general knowledge, you retrieve the exact CMS policy document relevant to the patient's procedure codes and inject it into the prompt.</p>
+
+  <div class="g2">
+    <div>
+      <h4>Indexing Pipeline — runs once before demo</h4>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">Step 1</div>
+          <div><div class="step-title">Read NCD/LCD PDFs</div><div class="step-body">Use <code>pypdf</code> to extract text from each policy PDF downloaded from CMS. Clean whitespace and page headers.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Step 2</div>
+          <div><div class="step-title">Chunk at 1500 tokens</div><div class="step-body">Split each document into overlapping 1500-token chunks with 200-token overlap. This keeps semantic context across chunk boundaries. Use <code>tiktoken</code> to count tokens accurately.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Step 3</div>
+          <div><div class="step-title">Embed via Nomic</div><div class="step-body">Call Nomic Embed Text v1.5 via LM Studio for each chunk. Returns a 768-dim vector. Maximum 2K tokens per call — chunks must stay under this limit.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Step 4</div>
+          <div><div class="step-title">Store in ChromaDB</div><div class="step-body">Persist each chunk with its embedding, source PDF name, LCD ID, and page number as metadata. Collection name: <code>ncd_lcd_policies</code>. Total storage for 5 PDFs: approximately 80–120 chunks.</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4>Retrieval — runs at every /api/validate call</h4>
+      <div class="codeblock" style="font-size:11px;"><span class="c-blue">import</span> chromadb
+
+client = chromadb.PersistentClient(path=<span class="c-green">"/data/chromadb"</span>)
+collection = client.get_collection(<span class="c-green">"ncd_lcd_policies"</span>)
+
+<span class="c-blue">def</span> <span class="c-teal">chromadb_retrieve</span>(query: str, top_k: int = <span class="c-amber">3</span>) -> list:
+    <span class="c-muted"># Embed the query using Nomic via LM Studio</span>
+    q_embedding = embed_text(query)
+
+    results = collection.query(
+        query_embeddings=[q_embedding],
+        n_results=top_k,
+        include=[<span class="c-green">"documents"</span>, <span class="c-green">"metadatas"</span>]
+    )
+    <span class="c-blue">return</span> [
+        {
+          <span class="c-green">"text"</span>:   results[<span class="c-green">"documents"</span>][<span class="c-amber">0</span>][i],
+          <span class="c-green">"source"</span>: results[<span class="c-green">"metadatas"</span>][<span class="c-amber">0</span>][i][<span class="c-green">"lcd_id"</span>],
+          <span class="c-green">"page"</span>:   results[<span class="c-green">"metadatas"</span>][<span class="c-amber">0</span>][i][<span class="c-green">"page"</span>]
+        }
+        <span class="c-blue">for</span> i <span class="c-blue">in</span> range(top_k)
+    ]</div>
+
+      <div class="notice amber">
+        <p><strong>Chunk size matters:</strong> Nomic Embed has a hard 2048-token limit. Set chunk size to 1500 tokens maximum. Going over silently truncates the embedding and degrades retrieval quality. Use <code>tiktoken</code> (not character count) to measure accurately.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 7: COMPONENT — MODEL LAYER -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="component-models">
+  <div class="eyebrow">Component 04</div>
+  <h2>Model Layer — Prompt Engineering</h2>
+  <p class="section-lead">The quality of the output depends entirely on how well the prompts are written. These are the exact prompt structures for each model call. Treat them as contracts — the output format must be JSON so the backend can parse it reliably.</p>
+
+  <h4>SOAP Note Generation Prompt (Qwen Instance 1 — PS 37)</h4>
+  <div class="codeblock"><span class="c-muted">System:</span>
+<span class="c-green">You are a clinical documentation specialist. You generate structured SOAP notes
+from doctor-patient encounter transcripts. You always output valid JSON.
+Use ICD-10 codes at the highest specificity level. Never use unspecified codes
+(e.g. prefer M51.16 over M54.5). Always link diagnosis codes to documented
+clinical evidence in the transcript.</span>
+
+<span class="c-muted">User:</span>
+<span class="c-green">PATIENT CONTEXT (from FHIR record):
+{patient_context_json}
+
+ENCOUNTER TRANSCRIPT:
+{full_transcript}
+
+Generate a structured SOAP note. Return ONLY this JSON, no other text:
+{
+  "subjective":    "patient's reported symptoms in detail",
+  "objective":     "examination findings, vitals, lab results",
+  "assessment":    "clinical assessment with primary and secondary diagnoses",
+  "plan":          "treatment plan, referrals, follow-up",
+  "icd10_codes":   [{"code": "M51.16", "description": "...", "confidence": 0.94}],
+  "cpt_codes":     [{"code": "99213", "description": "...", "confidence": 0.88}],
+  "clinical_reasoning": "brief explanation of key diagnostic decisions"
+}</span></div>
+
+  <h4>NCD/LCD Validation Prompt (Qwen Instance 2 — PS 39)</h4>
+  <div class="codeblock"><span class="c-muted">System:</span>
+<span class="c-green">You are a medical billing compliance specialist. You evaluate clinical
+documentation against CMS NCD/LCD coverage criteria. You identify exactly
+what is missing, insufficient, or inconsistent with payer requirements.
+Output valid JSON only.</span>
+
+<span class="c-muted">User:</span>
+<span class="c-green">SOAP NOTE TO VALIDATE:
+{soap_note}
+
+RELEVANT NCD/LCD POLICY EXCERPTS:
+Policy 1 — {policy_source_1}: {policy_text_1}
+Policy 2 — {policy_source_2}: {policy_text_2}
+Policy 3 — {policy_source_3}: {policy_text_3}
+
+Evaluate this documentation against these policies. Return ONLY this JSON:
+{
+  "approval_score": 74,
+  "gaps": [
+    {
+      "policy_ref": "LCD L35062",
+      "requirement": "minimum 6 weeks conservative treatment documented",
+      "current_doc": "documentation mentions back pain but no treatment duration",
+      "severity": "critical"
+    }
+  ],
+  "fixes": [
+    {
+      "gap_ref": 0,
+      "suggested_language": "Patient has undergone 7 weeks of physical therapy..."
+    }
+  ],
+  "passing_criteria": ["diagnosis code M51.16 matches LCD criteria", "..."]
+}</span></div>
+
+  <h4>Patient Summary Prompt (Llama 1B)</h4>
+  <div class="codeblock"><span class="c-muted">System:</span>
+<span class="c-green">You explain medical information in simple, friendly language that patients
+can understand. Avoid medical jargon. Be warm and reassuring. Output plain
+text, no JSON needed.</span>
+
+<span class="c-muted">User:</span>
+<span class="c-green">Based on this clinical note, write a short patient-friendly summary
+(3-4 sentences) explaining what happened at today's appointment,
+what the diagnosis means in simple terms, and what to do next.
+Language: {language}
+
+SOAP NOTE:
+{soap_note}</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 8: COMPONENT — FHIR INTEGRATION -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="component-fhir">
+  <div class="eyebrow">Component 05 — PS 31</div>
+  <h2>FHIR Integration via HAPI Test Server</h2>
+  <p class="section-lead">This is how PS 31 is solved without building a full interoperability platform. One real FHIR R4 API call at demo startup — then served from local cache for the rest of the demo.</p>
+
+  <div class="g2">
+    <div>
+      <h4>HAPI FHIR — What to call</h4>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">Call 1</div>
+          <div><div class="step-title">GET /Patient/{id}</div><div class="step-body">Returns demographics — name, DOB, gender, address. Use a patient with relevant conditions pre-existing in the HAPI test dataset.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Call 2</div>
+          <div><div class="step-title">GET /Condition?patient={id}</div><div class="step-body">Returns existing diagnoses as ICD-10 coded conditions. Shows the patient's medical history — fed directly into Qwen's SOAP generation prompt as context.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Call 3</div>
+          <div><div class="step-title">GET /MedicationRequest?patient={id}</div><div class="step-body">Returns current prescriptions. Qwen uses this to avoid drug interactions in the treatment plan and to reference relevant medication history.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-num">Call 4</div>
+          <div><div class="step-title">GET /AllergyIntolerance?patient={id}</div><div class="step-body">Returns documented allergies. Critical for the documentation AI to include in the SOAP note Assessment/Plan.</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h4>Caching Strategy (for offline demo)</h4>
+      <div class="codeblock" style="font-size:11px;"><span class="c-muted"># fhir_service.py</span>
+<span class="c-blue">import</span> httpx, json, os
+
+HAPI_BASE = <span class="c-green">"https://hapi.fhir.org/baseR4"</span>
+CACHE_PATH = <span class="c-green">"/data/fhir_patient_cache.json"</span>
+PATIENT_ID = <span class="c-green">"592"</span>  <span class="c-muted"># confirm a valid ID before hackathon</span>
+
+<span class="c-blue">async def</span> <span class="c-teal">get_patient_context</span>(patient_id: str) -> dict:
+    <span class="c-muted"># Serve from cache if available (offline safe)</span>
+    <span class="c-blue">if</span> os.path.exists(CACHE_PATH):
+        <span class="c-blue">with</span> open(CACHE_PATH) <span class="c-blue">as</span> f:
+            <span class="c-blue">return</span> json.load(f)
+
+    <span class="c-muted"># Otherwise fetch live and cache</span>
+    <span class="c-blue">async with</span> httpx.AsyncClient() <span class="c-blue">as</span> client:
+        patient    = (<span class="c-blue">await</span> client.get(f<span class="c-green">"{HAPI_BASE}/Patient/{patient_id}"</span>)).json()
+        conditions = (<span class="c-blue">await</span> client.get(f<span class="c-green">"{HAPI_BASE}/Condition?patient={patient_id}"</span>)).json()
+        meds       = (<span class="c-blue">await</span> client.get(f<span class="c-green">"{HAPI_BASE}/MedicationRequest?patient={patient_id}"</span>)).json()
+        allergies  = (<span class="c-blue">await</span> client.get(f<span class="c-green">"{HAPI_BASE}/AllergyIntolerance?patient={patient_id}"</span>)).json()
+
+    result = parse_fhir_bundle(patient, conditions, meds, allergies)
+    <span class="c-blue">with</span> open(CACHE_PATH, <span class="c-green">"w"</span>) <span class="c-blue">as</span> f:
+        json.dump(result, f)
+    <span class="c-blue">return</span> result</div>
+
+      <div class="notice">
+        <p><strong>Demo line:</strong> "Before the AI writes a single word, it pulls the patient's complete longitudinal record via FHIR R4 — the same standard that Epic and Cerner expose in production hospitals."</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 9: COMPONENT — REACT FRONTEND -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="component-frontend">
+  <div class="eyebrow">Component 06</div>
+  <h2>React Frontend — 3 Screens</h2>
+  <p class="section-lead">Vite + React + Tailwind. The frontend is a single-page app with three sequential screens. The same <code>ClinicalRecord</code> state object is progressively enriched as the user moves through each stage.</p>
+
+  <h4>Shared State Object — <code>ClinicalRecord</code></h4>
+  <div class="codeblock"><span class="c-muted">// types.ts — shared across all 3 screens</span>
+<span class="c-blue">interface</span> <span class="c-teal">ClinicalRecord</span> {
+  patient:         FHIRPatientContext;    <span class="c-muted">// populated on Screen 1 load</span>
+  transcript:      string;               <span class="c-muted">// populated after Whisper STT</span>
+  soap_note:       SOAPNote;             <span class="c-muted">// populated after Screen 1 → 2</span>
+  icd10_codes:     ICD10Code[];          <span class="c-muted">// part of soap_note</span>
+  cpt_codes:       CPTCode[];            <span class="c-muted">// part of soap_note</span>
+  validation:      ValidationResult;    <span class="c-muted">// populated after Screen 2 → 3</span>
+  patient_summary: string;              <span class="c-muted">// populated on Screen 3</span>
+}</div>
+
+  <div class="g3">
+    <div class="card blue-top">
+      <div class="tag tag-blue">Screen 1 — Encounter Capture</div>
+      <h3 style="font-size:16px;">What the user sees</h3>
+      <p style="font-size:13px;">Left sidebar: FHIR patient card (auto-loaded on mount). Main area: audio recorder with waveform + real-time transcript streaming via SSE. Bottom: "Generate Clinical Note" button — disabled until transcript is populated.</p>
+      <p style="font-size:13px; margin-top:8px;"><strong>Key interactions:</strong> Record audio → Whisper processes → segments stream in → user reviews transcript → click Generate → Qwen Instance 1 runs → navigate to Screen 2.</p>
+    </div>
+    <div class="card blue-top">
+      <div class="tag tag-blue">Screen 2 — SOAP Note Editor</div>
+      <h3 style="font-size:16px;">What the user sees</h3>
+      <p style="font-size:13px;">Four editable text panels: S / O / A / P. Each panel is pre-filled by Qwen's output. ICD-10 code chips below the Assessment panel — each chip shows code + description + confidence %. CPT code chips similarly.</p>
+      <p style="font-size:13px; margin-top:8px;"><strong>Key interactions:</strong> Edit any panel text → ICD code chips are clickable to remove/add → "Run Validation" button triggers PS 39 pipeline → navigate to Screen 3.</p>
+    </div>
+    <div class="card blue-top">
+      <div class="tag tag-blue">Screen 3 — Validation Scorecard</div>
+      <h3 style="font-size:16px;">What the user sees</h3>
+      <p style="font-size:13px;">Top: animated approval probability gauge (0–100%). Middle: gap checklist — each row shows the policy requirement, what's missing, severity badge, and a "Fix This" button. Bottom: policy citation, patient summary panel.</p>
+      <p style="font-size:13px; margin-top:8px;"><strong>Key interactions:</strong> Click "Fix This" → AI-suggested language appears → user clicks "Apply" → gauge re-animates upward → Regulatory Updates panel shows PS 35 layer.</p>
+    </div>
+  </div>
+
+  <h4>Folder Structure</h4>
+  <div class="codeblock"><span class="c-teal">src/</span>
+├── <span class="c-teal">components/</span>
+│   ├── PatientSidebar.jsx      <span class="c-muted"># FHIR patient card — Screen 1</span>
+│   ├── AudioRecorder.jsx       <span class="c-muted"># Whisper STT integration — Screen 1</span>
+│   ├── TranscriptStream.jsx    <span class="c-muted"># SSE-driven real-time transcript</span>
+│   ├── SOAPEditor.jsx          <span class="c-muted"># 4-panel editable note — Screen 2</span>
+│   ├── ICD10Chips.jsx          <span class="c-muted"># ICD code chips with confidence</span>
+│   ├── ApprovalGauge.jsx       <span class="c-muted"># Animated probability dial — Screen 3</span>
+│   ├── GapChecklist.jsx        <span class="c-muted"># Gap rows with Fix This — Screen 3</span>
+│   ├── PatientSummary.jsx      <span class="c-muted"># Plain-English summary + language toggle</span>
+│   └── RegulatoryPanel.jsx     <span class="c-muted"># PS 35 updates — Screen 3</span>
+├── <span class="c-teal">screens/</span>
+│   ├── EncounterCapture.jsx    <span class="c-muted"># Screen 1</span>
+│   ├── SOAPNote.jsx            <span class="c-muted"># Screen 2</span>
+│   └── ValidationScore.jsx     <span class="c-muted"># Screen 3</span>
+├── <span class="c-teal">services/</span>
+│   └── api.js                  <span class="c-muted"># all fetch() calls to localhost:8000</span>
+├── <span class="c-teal">hooks/</span>
+│   └── useClinicalRecord.js    <span class="c-muted"># shared state management</span>
+└── App.jsx                     <span class="c-muted"># screen router + state container</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 10: END-TO-END DATA FLOW -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="dataflow">
+  <div class="eyebrow">Section 10</div>
+  <h2>End-to-End Data Flow</h2>
+  <p class="section-lead">This is the complete journey of a single clinical encounter from audio input to validated insurance-ready documentation. Every arrow is a real API call with defined input/output contracts.</p>
+
+  <div class="codeblock">
+<span class="c-teal">USER ACTION: Opens app and clicks "Load Patient"</span>
+  Frontend → GET /api/patient/592
+  Backend  → serves from /data/fhir_patient_cache.json
+  Frontend → renders PatientSidebar (name, dx, meds, allergies)
+
+<span class="c-teal">USER ACTION: Presses Record, plays 45-sec audio clip</span>
+  Frontend → POST /api/transcribe  { audio: file.wav }
+  Backend  → Whisper medium model  → transcript + segments
+  Backend  → SSE stream segments   → Frontend TranscriptStream updates live
+  Frontend → full_text stored in ClinicalRecord.transcript
+
+<span class="c-teal">USER ACTION: Clicks "Generate Clinical Note"</span>
+  Frontend → POST /api/generate-soap { transcript, patient_context }
+  Backend  → Qwen Instance 1 (120K) with SOAP prompt
+             [~15-25 seconds inference time]
+  Backend  → returns { soap_note: {S,O,A,P}, icd10_codes, cpt_codes }
+  Frontend → navigates to Screen 2, populates all 4 SOAP panels + ICD chips
+
+<span class="c-teal">USER ACTION: Reviews SOAP note, clicks "Run Validation"</span>
+  Frontend → POST /api/validate { soap_note, icd10_codes }
+  Backend  → Nomic embed query → ChromaDB retrieve top-3 policy chunks
+  Backend  → Qwen Instance 2 (240K) gap analysis  [~20-30 seconds]
+  Backend  → Gemma4 26B compliance check          [~10-15 seconds, parallel]
+  Backend  → merge scores (0.6/0.4 weighting)
+  Backend  → returns { approval_probability: 74, gaps: [...], fixes: [...] }
+  Frontend → navigates to Screen 3, renders gauge at 74%, gap checklist
+
+<span class="c-teal">USER ACTION: Clicks "Fix This" on a gap</span>
+  Frontend → renders suggested_language inline (no API call needed — fix is in response)
+  User     → clicks "Apply" → SOAP note updated in Screen 2 state
+  Frontend → re-calls POST /api/validate with updated note
+  Backend  → [same pipeline, ~30 seconds]
+  Backend  → returns { approval_probability: 93, gaps: [...fewer...] }
+  Frontend → gauge animates from 74% → 93%  ← THIS IS THE DEMO WOW MOMENT
+
+<span class="c-teal">USER ACTION: Clicks "Patient Summary"</span>
+  Frontend → POST /api/patient-summary { soap_note, language: "en" }
+  Backend  → Llama 3.2 1B  [~2-3 seconds]
+  Backend  → returns { summary_text: "Today you were seen for..." }
+  Frontend → renders PatientSummary panel
+
+<span class="c-teal">USER ACTION: Clicks "Regulatory Updates"</span>
+  Frontend → GET /api/regulatory
+  Backend  → returns static mock JSON (2 LCD change entries)
+  Frontend → renders RegulatoryPanel  ← PS 35 moment
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 11: API CONTRACTS -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="api">
+  <div class="eyebrow">Section 11</div>
+  <h2>Full API Contracts</h2>
+  <p class="section-lead">The complete request and response shapes for every endpoint. Frontend and backend engineers should agree on these before writing any code — they are the handshake between the two teams.</p>
+
+  <div class="g2">
+    <div class="card teal-top">
+      <div class="tag tag-teal">POST /api/generate-soap</div>
+      <div class="codeblock" style="font-size:11px; margin-top:12px;"><span class="c-muted">// Request</span>
+{
+  <span class="c-green">"transcript"</span>:       <span class="c-amber">"string"</span>,
+  <span class="c-green">"patient_context"</span>: {
+    <span class="c-green">"name"</span>:       <span class="c-amber">"string"</span>,
+    <span class="c-green">"age"</span>:        <span class="c-amber">number</span>,
+    <span class="c-green">"conditions"</span>: [<span class="c-amber">"string"</span>],
+    <span class="c-green">"medications"</span>:[<span class="c-amber">"string"</span>],
+    <span class="c-green">"allergies"</span>:  [<span class="c-amber">"string"</span>]
+  }
+}
+
+<span class="c-muted">// Response</span>
+{
+  <span class="c-green">"soap_note"</span>: {
+    <span class="c-green">"subjective"</span>: <span class="c-amber">"string"</span>,
+    <span class="c-green">"objective"</span>:  <span class="c-amber">"string"</span>,
+    <span class="c-green">"assessment"</span>: <span class="c-amber">"string"</span>,
+    <span class="c-green">"plan"</span>:       <span class="c-amber">"string"</span>
+  },
+  <span class="c-green">"icd10_codes"</span>: [{
+    <span class="c-green">"code"</span>:        <span class="c-amber">"M51.16"</span>,
+    <span class="c-green">"description"</span>: <span class="c-amber">"string"</span>,
+    <span class="c-green">"confidence"</span>:  <span class="c-amber">0.94</span>
+  }],
+  <span class="c-green">"cpt_codes"</span>: [{
+    <span class="c-green">"code"</span>:        <span class="c-amber">"72148"</span>,
+    <span class="c-green">"description"</span>: <span class="c-amber">"string"</span>,
+    <span class="c-green">"confidence"</span>:  <span class="c-amber">0.88</span>
+  }]
+}</div>
+    </div>
+    <div class="card teal-top">
+      <div class="tag tag-teal">POST /api/validate</div>
+      <div class="codeblock" style="font-size:11px; margin-top:12px;"><span class="c-muted">// Request</span>
+{
+  <span class="c-green">"soap_note"</span>: {
+    <span class="c-green">"subjective"</span>: <span class="c-amber">"string"</span>,
+    <span class="c-green">"objective"</span>:  <span class="c-amber">"string"</span>,
+    <span class="c-green">"assessment"</span>: <span class="c-amber">"string"</span>,
+    <span class="c-green">"plan"</span>:       <span class="c-amber">"string"</span>
+  },
+  <span class="c-green">"icd10_codes"</span>: [<span class="c-amber">"M51.16"</span>]
+}
+
+<span class="c-muted">// Response</span>
+{
+  <span class="c-green">"approval_probability"</span>: <span class="c-amber">74</span>,
+  <span class="c-green">"gaps"</span>: [{
+    <span class="c-green">"policy_ref"</span>:   <span class="c-amber">"LCD L35062"</span>,
+    <span class="c-green">"requirement"</span>:  <span class="c-amber">"string"</span>,
+    <span class="c-green">"current_doc"</span>:  <span class="c-amber">"string"</span>,
+    <span class="c-green">"severity"</span>:     <span class="c-amber">"critical|major|minor"</span>
+  }],
+  <span class="c-green">"fixes"</span>: [{
+    <span class="c-green">"gap_index"</span>:          <span class="c-amber">0</span>,
+    <span class="c-green">"suggested_language"</span>: <span class="c-amber">"string"</span>
+  }],
+  <span class="c-green">"policy_references"</span>:  [<span class="c-amber">"LCD L35062 p.4"</span>],
+  <span class="c-green">"human_review_flags"</span>: [<span class="c-amber">"string"</span>]
+}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 12: UI SCREENS -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="screens">
+  <div class="eyebrow">Section 12</div>
+  <h2>UI Screen Specifications</h2>
+  <p class="section-lead">Minimum viable interface for each screen. These are not wireframes — they are build specifications. Pixel-perfect is not the goal. Functional, readable, and smooth on demo day is the goal.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Screen</th><th>Required Elements</th><th>Loading States</th><th>Key Interaction</th><th>Build Time</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Screen 1</strong><br>Encounter Capture</td>
+        <td>Patient sidebar (FHIR data), Audio record button, Real-time transcript area (SSE), "Generate Note" CTA button</td>
+        <td>Patient loading spinner, Transcription "live" indicator, SOAP generation progress bar</td>
+        <td>Play pre-recorded audio → transcript streams in → click Generate → navigate to Screen 2</td>
+        <td>~4h</td>
+      </tr>
+      <tr>
+        <td><strong>Screen 2</strong><br>SOAP Note Editor</td>
+        <td>4-panel SOAP layout (S/O/A/P), each editable, ICD-10 code chips with confidence %, CPT code chips, "Run Validation" CTA</td>
+        <td>Panel-by-panel fill animation as Qwen streams output, Code chips appear with confidence bars</td>
+        <td>Review + optionally edit SOAP sections → click Run Validation → navigate to Screen 3</td>
+        <td>~4h</td>
+      </tr>
+      <tr>
+        <td><strong>Screen 3</strong><br>Validation Scorecard</td>
+        <td>Approval probability gauge (animated), Gap checklist with severity badges, "Fix This" buttons, Policy reference citations, Patient summary panel, Regulatory updates panel</td>
+        <td>Gauge animates in from 0, Gaps appear one by one, Fix application re-animates gauge upward</td>
+        <td>Click "Fix This" → apply suggestion → gauge jumps to 93% — THIS IS THE DEMO MOMENT</td>
+        <td>~4h</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <div class="notice">
+    <p><strong>Frontend priority rule:</strong> Build Screen 3's approval gauge animation first. That is the single most important UI element in the entire demo. If you run out of time, Screen 1 and 2 can be simplified — Screen 3's gauge going from 74% to 93% is non-negotiable.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 13: PRE-EVENT SETUP -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="setup">
+  <div class="eyebrow">Section 13</div>
+  <h2>Pre-Event Setup — Complete Checklist</h2>
+  <p class="section-lead">Everything on this list must be done before the hackathon clock starts. None of it requires coding. Assign one person to own each task and confirm completion 24 hours before the event.</p>
+
+  <div class="g2">
+    <div>
+      <h4>Software Installation</h4>
+      <ul class="checklist">
+        <li><code>pip install openai-whisper</code> — download medium model weights after</li>
+        <li><code>pip install chromadb pypdf tiktoken httpx fastapi uvicorn</code></li>
+        <li><code>npm create vite@latest clarity-claim -- --template react</code></li>
+        <li><code>npm install tailwindcss axios</code> in the frontend folder</li>
+        <li>Verify LM Studio is running and both Qwen instances respond at <code>localhost:1234</code></li>
+        <li>Test Gemma4 and Llama1B load correctly via LM Studio</li>
+        <li>Confirm Nomic Embed is accessible via LM Studio embedding endpoint</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Data & Assets</h4>
+      <ul class="checklist">
+        <li>Download LCD L35062 PDF from cms.gov/medicare-coverage-database</li>
+        <li>Download LCD L34067 PDF (Cognitive Tests)</li>
+        <li>Download LCD L35101 PDF (Sleep Studies)</li>
+        <li>Run PDF chunking + ChromaDB indexing script — confirm vectors are stored</li>
+        <li>Make HAPI FHIR calls for Patient ID 592 — save all 4 responses to cache file</li>
+        <li>Record or source 45-second clinical encounter audio clip (low back pain scenario)</li>
+        <li>Pre-run Whisper on the audio clip — save transcript to fallback JSON</li>
+        <li>Pre-generate SOAP note from transcript via Qwen — save as fallback JSON</li>
+        <li>Pre-generate validation result — save with 74% score as fallback JSON</li>
+        <li>Pre-generate 93% result (post-fix) — save as second fallback JSON</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 14: 48-HOUR BUILD PLAN -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="build">
+  <div class="eyebrow">Section 14</div>
+  <h2>48-Hour Build Plan</h2>
+  <p class="section-lead">Four-person team assumed: Backend Engineer 1 (BE1), Backend Engineer 2 (BE2), Frontend Engineer (FE), BA/PM. Parallel tracks — BE and FE work simultaneously after Hour 6.</p>
+
+  <div class="tl">
+    <div class="tl-item">
+      <div class="tl-tag">Hours 0–6 — Foundation (All hands)</div>
+      <div class="tl-title">Environment verified, first end-to-end call working</div>
+      <div class="tl-body">
+        <strong>BE1:</strong> FastAPI skeleton — all 6 routes stubbed and returning mock data. Confirm LM Studio connection works with a test prompt to Qwen Instance 1. FHIR cache loading verified.<br>
+        <strong>BE2:</strong> PDF chunking script — read 3 LCD PDFs, chunk at 1500 tokens, embed via Nomic, store in ChromaDB. Run indexing to completion. Confirm retrieval returns relevant chunks for "lumbar MRI medical necessity".<br>
+        <strong>FE:</strong> Vite project scaffolded, Tailwind configured, 3-screen router working with placeholder content. API service layer set up to call localhost:8000.<br>
+        <strong>PM:</strong> Demo scenario fully scripted. Audio clip sourced and tested with Whisper. Fallback JSONs pre-generated for all 4 demo states.
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-tag">Hours 6–20 — Core AI Pipeline (BE1 + BE2)</div>
+      <div class="tl-title">Real SOAP generation and validation working end-to-end</div>
+      <div class="tl-body">
+        <strong>BE1:</strong> /api/generate-soap fully implemented. Prompt engineering — iterate until Qwen consistently outputs valid JSON with M51.16 (not M54.5). Whisper integration for /api/transcribe. FHIR patient context correctly injected into SOAP prompt.<br>
+        <strong>BE2:</strong> /api/validate fully implemented. RAG retrieval working — top-3 chunks from LCD L35062 for the demo scenario. Qwen Instance 2 gap analysis returning structured JSON. Gemma4 compliance check running. Score merge formula (0.6/0.4) implemented. Patient summary via Llama 1B working.<br>
+        <strong>FE:</strong> Screen 1 built — patient sidebar, audio recorder UI, SSE transcript streaming, Generate button. Screen 2 built — 4-panel SOAP display with editable text areas and ICD code chips.
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-tag">Hours 20–34 — Integration (All hands)</div>
+      <div class="tl-title">Frontend wired to real backend — full demo flow working</div>
+      <div class="tl-body">
+        <strong>BE + FE together:</strong> Wire Screen 1 → API → Screen 2 → API → Screen 3. Fix all JSON parsing errors. Handle loading states (spinners while Qwen runs). Screen 3 built — approval gauge, gap checklist, Fix This buttons, patient summary panel, regulatory panel. Run the complete demo flow 3 times and fix every failure point.
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-tag">Hours 34–44 — Polish (FE + PM)</div>
+      <div class="tl-title">Demo-quality UI — smooth, no dead states</div>
+      <div class="tl-body">
+        <strong>FE:</strong> Gauge animation — confirm smooth 74% → 93% transition on fix. ICD code chips styled cleanly. Gap checklist severity badges coloured (red/amber/green). Loading states on every slow call. Fallback JSON wired — if any API call errors, serve pre-generated data silently.<br>
+        <strong>PM:</strong> Run complete 8-minute demo script 3 times, timed. Identify any rough edges in flow. Brief every team member on the 5 BA pain point numbers they need to know.
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-tag">Hours 44–48 — Freeze + Pre-warm</div>
+      <div class="tl-title">No new features. Demo prep only.</div>
+      <div class="tl-body">No code changes after Hour 44. Send warm-up prompts to both Qwen instances. Run ChromaDB indexing one final time to ensure freshness. Test the complete demo with internet cable physically unplugged — confirm it works. Prepare the ethernet cable as a physical prop. Set screen brightness, font size, and zoom level for a large display. Everyone sleeps.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 15: RISKS & MITIGATIONS -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="risks">
+  <div class="eyebrow">Section 15</div>
+  <h2>Risks & Mitigations</h2>
+  <p class="section-lead">Every risk on this list has a mitigation. None of these should cause a demo failure if the pre-event setup was done correctly.</p>
+
+  <div class="tbl"><table>
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Qwen cold-start silence</strong> — model weights not in VRAM when demo begins</td><td>High if not mitigated</td><td>20–90 sec dead silence in front of judges</td><td>Send warm-up prompts to both instances 5 minutes before presentation. Keep LM Studio open throughout.</td></tr>
+      <tr><td><strong>Qwen outputs invalid JSON</strong> — response parsing fails mid-demo</td><td>Medium</td><td>Demo halts or shows error</td><td>Wrap all Qwen responses in try/catch. If JSON parsing fails, silently serve pre-generated fallback JSON. Frontend never sees an error state.</td></tr>
+      <tr><td><strong>HAPI FHIR server down</strong> — test server unavailable during demo</td><td>Low</td><td>No patient data loads</td><td>Pre-cache all 4 FHIR responses before the event. Backend always serves from cache first. Live HAPI call is only attempted if cache is missing.</td></tr>
+      <tr><td><strong>ChromaDB retrieval misses</strong> — wrong policy chunks retrieved for demo scenario</td><td>Medium if not tested</td><td>Validation gap analysis is wrong</td><td>Before the event, manually verify that querying "lumbar MRI radiculopathy medical necessity M51.16" returns LCD L35062 chunks. If not, adjust the demo query or re-chunk the PDF with better overlap.</td></tr>
+      <tr><td><strong>Gemma4 is slow</strong> — second validation pass takes too long</td><td>Low</td><td>Total validation time &gt; 45 seconds</td><td>Run Gemma validation in parallel with Qwen Instance 2 using Python asyncio. Both calls start simultaneously. Total time = max(Qwen, Gemma) not sum. Target: under 35 seconds total.</td></tr>
+      <tr><td><strong>ICD code is M54.5 not M51.16</strong> — Qwen picks unspecified code</td><td>Medium</td><td>Kills the "clinical reasoning" demo narrative</td><td>Add explicit instruction in the SOAP prompt: "Never use M54.5. The transcript mentions radiculopathy — this maps to M51.16. Always choose the most specific code supported by the transcript evidence."</td></tr>
+      <tr><td><strong>Internet available in demo room</strong> — weakens "no cloud" story</td><td>High</td><td>Demo narrative is weaker</td><td>Bring your own ethernet cable. Physically disconnect it during the "no cloud" moment. This is a planned prop, not a risk.</td></tr>
+    </tbody>
+  </table></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- SECTION 16: DEMO RUNBOOK -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="section" id="demo">
+  <div class="eyebrow">Section 16</div>
+  <h2>Demo Runbook</h2>
+  <p class="section-lead">The exact sequence of actions during the 8-minute judge presentation. This is a runbook, not a script — it tells each person what to do and when, not what to say. The BA/presenter owns the words. The engineer owns the screen.</p>
+
+  <div class="steps">
+    <div class="step"><div class="step-num">0:00 – 1:00</div><div>
+      <div class="step-title">The hook — BA speaks, no demo yet</div>
+      <div class="step-body">BA delivers the "$262B denied claims" opening statement. Engineer has the browser open to Screen 1, patient sidebar already loaded. No typing. No clicking. The visual is already correct — let the BA talk.</div>
+    </div></div>
+    <div class="step"><div class="step-num">1:00 – 1:30</div><div>
+      <div class="step-title">FHIR patient loads — PS 31 moment</div>
+      <div class="step-body">Engineer clicks "Load Patient." Patient record populates the sidebar from FHIR cache. BA: <em>"Before the AI writes a single word, it pulls the complete patient history via FHIR R4 — the same standard Epic and Cerner use in production."</em></div>
+    </div></div>
+    <div class="step"><div class="step-num">1:30 – 4:00</div><div>
+      <div class="step-title">Encounter → SOAP Note — PS 37 moment</div>
+      <div class="step-body">Engineer plays the pre-recorded audio clip. Transcript streams in. After clip ends, clicks "Generate Clinical Note." Qwen runs (~20 sec — BA narrates during wait). Screen 2 loads with SOAP note. Engineer points to the ICD chip: M51.16. BA: <em>"It didn't just transcribe. It reasoned clinically — and picked the specific code that satisfies Medicare's LCD for lumbar MRI."</em></div>
+    </div></div>
+    <div class="step"><div class="step-num">4:00 – 6:30</div><div>
+      <div class="step-title">Validation scorecard — PS 39 moment — THE WOW</div>
+      <div class="step-body">Engineer clicks "Run Validation." On-screen: "Searching LCD L35062..." (~30 sec — BA narrates). Gauge lands at 74%. Red gap appears: missing 6-week conservative treatment documentation. Engineer clicks "Fix This." AI suggests exact language. Engineer clicks "Apply." Gauge animates to 93%. BA: <em>"That edit took 4 seconds. That claim was going to be denied. Now it won't be."</em> Pause. Let that land.</div>
+    </div></div>
+    <div class="step"><div class="step-num">6:30 – 7:15</div><div>
+      <div class="step-title">Regulatory panel — PS 35 moment</div>
+      <div class="step-body">Engineer clicks "Regulatory Updates." Panel shows 2 LCD updates from last 24 hours. BA: <em>"The system monitors CMS every night and auto-updates its validation rules. Zero manual maintenance."</em></div>
+    </div></div>
+    <div class="step"><div class="step-num">7:15 – 7:50</div><div>
+      <div class="step-title">The "no cloud" close</div>
+      <div class="step-body">Second team member physically removes the ethernet cable from the laptop. Engineer refreshes the app, runs the full flow again. It works. BA: <em>"No OpenAI. No cloud API. No PHI ever leaves this building. HIPAA-ready, on-premise clinical AI — built in 48 hours."</em></div>
+    </div></div>
+    <div class="step"><div class="step-num">7:50 – 8:00</div><div>
+      <div class="step-title">Stop. Don't over-explain.</div>
+      <div class="step-body">One final sentence. Silence. Judges ask questions. Be ready for: "How does the NCD/LCD database stay current?" (PS 35 answer), "How would this work with Epic?" (FHIR R4 answer), "What about HIPAA compliance?" (local inference answer).</div>
+    </div></div>
+  </div>
+
+  <div class="card dark" style="margin-top:24px; padding:24px 28px;">
+    <div class="tag tag-dark">Product Name</div>
+    <h3 style="font-size:28px; font-family: var(--serif); color: #78a9ff; letter-spacing: -0.02em;">ClarityClaim</h3>
+    <p style="font-size:15px; color: #a8a8a8; margin-top:8px;">"Write it right. Validate before you submit."</p>
+    <p style="font-size:13px; color:#6f6f6f; margin-top:12px;">Documentation intelligence + NCD/LCD validation + regulatory self-maintenance. On-premise. No cloud. No PHI exposure. Built for the $262B denial problem every US hospital is bleeding from right now.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="background: var(--ink); border-top: 1px solid #393939; padding: 28px 64px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+    <div>
+      <div style="font-family: var(--serif); color:#fff; font-size:15px; font-weight:600;">ClarityClaim — Architect HLD v1.0</div>
+      <div style="font-family: var(--mono); color:#525252; font-size:11px; margin-top:4px;">PS 37 + 39 Primary · PS 31 FHIR · PS 35 Regulatory · Whisper STT · ChromaDB RAG · Qwen3.6-35B × 2</div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <span style="background:#1e3a5f; border:1px solid #0f62fe; border-radius:2px; padding:3px 10px; font-family:var(--mono); font-size:11px; color:#78a9ff;">v1.0 — Ready to Build</span>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</body>
+</html>

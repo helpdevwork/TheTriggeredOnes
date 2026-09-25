@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="ClarityClaim.API/ClarityClaim.API.csproj" />
+  <Project Path="ClarityClaim.Domain/ClarityClaim.Domain.csproj" />
+  <Project Path="ClarityClaim.Infrastructure/ClarityClaim.Infrastructure.csproj" />
+  <Project Path="ClarityClaim.Services/ClarityClaim.Services.csproj" />
+  <Project Path="ClarityClaim.Tests/ClarityClaim.Tests.csproj" />
+</Solution>

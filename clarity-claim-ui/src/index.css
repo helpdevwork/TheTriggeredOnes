@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* Manual light/dark toggle via a .dark class on <html>, not just prefers-color-scheme */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* HealthAsyst-inspired palette: teal/green primary, clean light surface */
+  --hc-primary: #0f9d8e;
+  --hc-primary-dark: #0b7d71;
+  --hc-accent: #65a30d;
+  --hc-bg: #f4f7f6;
+  --hc-surface: #ffffff;
+  --hc-surface-2: #eef3f1;
+  --hc-border: #dbe4e1;
+  --hc-text: #1c2b28;
+  --hc-text-muted: #5b6b67;
+}
+
+.dark {
+  --hc-primary: #2dd4bf;
+  --hc-primary-dark: #14b8a6;
+  --hc-accent: #a3e635;
+  --hc-bg: #0f1715;
+  --hc-surface: #17211f;
+  --hc-surface-2: #1e2b28;
+  --hc-border: #2b3a36;
+  --hc-text: #eef5f3;
+  --hc-text-muted: #93a8a3;
+}
+
+body {
+  margin: 0;
+  background-color: var(--hc-bg);
+  color: var(--hc-text);
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer components {
+  .hc-input {
+    width: 100%;
+    background-color: var(--hc-surface);
+    border: 1px solid var(--hc-border);
+    color: var(--hc-text);
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+  }
+  .hc-input:focus {
+    border-color: var(--hc-primary);
+  }
+  .hc-card {
+    background-color: var(--hc-surface);
+    border: 1px solid var(--hc-border);
+    border-radius: 0.75rem;
+  }
+}
